@@ -1,0 +1,27 @@
+You will judge whether the recommended Top-K satisfies the active directive.
+
+## Active directive
+- goal: {{ directive.goal }}
+- structured: {{ directive.structured_constraints | tojson }}
+- NL: {{ directive.natural_language }}
+
+## Top-K (already attribute-checked for hard constraints)
+{% for r in ranked -%}
+- {{ loop.index }}. id={{ r.item_id }} | score={{ "%.3f"|format(r.score) }}
+  · personal: {{ r.rationale.personal }}
+  · directive: {{ r.rationale.directive }}
+  · trend: {{ r.rationale.trend }}
+{% endfor %}
+
+Auto-checked structured violations: {{ structured_violations | tojson }}
+
+Score directive compliance in [0, 1]; the score MUST drop if items appear
+to contradict the NL intent even when structured rules pass.
+
+Return JSON:
+{
+  "passed": true,
+  "compliance_score": 0.0,
+  "violations": ["..."],
+  "suggested_refinement": "..."     # only if passed=false
+}

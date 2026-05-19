@@ -1,0 +1,18 @@
+The previous directive failed validation. Refine it WITHOUT changing the
+business goal, addressing each violation. Tighten constraints rather than
+loosening them.
+
+## Previous directive
+{{ directive.model_dump_json(indent=2) }}
+
+## Validation report
+- compliance_score: {{ report.compliance_score }}
+- violations: {{ report.violations | tojson }}
+- suggested_refinement: {{ report.suggested_refinement or "(none)" }}
+
+## Domain vocabulary
+{% for bucket, terms in vocabulary.items() -%}
+- {{ bucket }} (showing up to 40 of {{ terms | length }}): {{ terms[:40] | tojson }}
+{% endfor %}
+
+Return the refined Directive in the exact same JSON schema.

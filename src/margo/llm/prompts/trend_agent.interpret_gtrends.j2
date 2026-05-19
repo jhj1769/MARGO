@@ -1,0 +1,66 @@
+You are interpreting a deterministic Google Trends snapshot for the
+MARGO recommendation pipeline. The numbers below are *real* — do NOT
+invent additional terms, brands, or statistics.
+
+## Snapshot meta
+- domain:      {{ snapshot.domain }}
+- time_window: {{ snapshot.time_window }}  (region: {{ snapshot.region }})
+- snapshot:    {{ snapshot.snapshot_date }}
+- source:      {{ snapshot.source }}
+- pool stats:  {{ snapshot.keyword_pool_stats | tojson }}
+
+{% if directive_hint -%}
+## Operator directive (focus your interpretation on this when possible)
+{{ directive_hint }}
+{% endif %}
+
+## Rising keywords  (top — sorted by growth%)
+{% for s in snapshot.rising_keywords[:12] -%}
+- {{ s.keyword }}  · growth {{ s.growth_pct }}%  · score {{ s.absolute_score }}  · src={{ s.source }}
+{% endfor %}
+
+## Stable-top keywords
+{% for s in snapshot.stable_top_keywords[:8] -%}
+- {{ s.keyword }}  · score {{ s.absolute_score }}  · src={{ s.source }}
+{% endfor %}
+
+## Declining keywords
+{% for s in snapshot.declining_keywords[:6] -%}
+- {{ s.keyword }}  · growth {{ s.growth_pct }}%
+{% endfor %}
+
+## Rising queries (Google "breakout" — closest to real trend movement)
+{% for q in snapshot.rising_queries[:10] -%}
+- seed "{{ q.seed }}" → "{{ q.query }}"  (+{{ q.growth_pct }}%)
+{% endfor %}
+
+## Per-category direction
+{% for c in snapshot.category_trends[:10] -%}
+- {{ c.category }}: {{ c.direction }}  (mean_score={{ c.mean_score }}, mean_growth={{ c.mean_growth_pct }}%)
+  · key terms: {{ c.key_terms | join(", ") }}
+{% endfor %}
+
+---
+
+Produce a MARGO TrendInterpretation that:
+- summarises the *direction of travel* in 1–2 sentences (use rising vs
+  declining language; mention 1–2 representative keywords/silhouettes),
+- lists 4–8 short "rising_keywords" tags (≤ 3 words each, lowercase, drawn
+  ONLY from the lists above; avoid brand names),
+- fills rising_attributes for the MARGO vocabulary buckets — color,
+  silhouette, material — using terms that genuinely appear in the rising
+  or stable lists. Leave a bucket empty if no evidence supports it.
+
+Return JSON:
+{
+  "domain": "{{ snapshot.domain }}",
+  "time_window": "{{ snapshot.time_window }}",
+  "summary": "...",
+  "keywords": ["..."],
+  "rising_attributes": {
+    "color": ["..."],
+    "silhouette": ["..."],
+    "material": ["..."]
+  },
+  "raw_sources": []
+}

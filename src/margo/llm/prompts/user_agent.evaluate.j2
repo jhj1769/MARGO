@@ -1,0 +1,35 @@
+## Active directive (from Expert)
+- goal: {{ directive.goal }}
+- structured constraints: {{ directive.structured_constraints | tojson }}
+- in your own words: {{ directive.natural_language }}
+
+## Trend context (from Trend Agent)
+{% if trend -%}
+- summary: {{ trend.summary }}
+- rising keywords: {{ trend.keywords | join(", ") }}
+{% else -%}
+- (no trend signal available)
+{% endif %}
+
+## Your interaction history (most recent {{ history[-20:] | length }} of {{ history | length }})
+{% for h in history[-20:] -%}
+- {{ h }}
+{% endfor %}
+
+## Candidate items
+{% for c in candidates -%}
+[{{ loop.index }}] {{ c.description }}
+{% endfor %}
+
+Score every candidate in [0, 1] and produce a 3-layer rationale:
+- `personal` — does it match THIS user's taste & price band?
+- `directive` — does it serve the Expert's intent (state the trade-off if any)?
+- `trend` — is it aligned with the trend context?
+
+Return JSON with ALL {{ candidates | length }} candidates. Use the number (1, 2, ...) as item_id:
+{
+  "ranked": [
+    {"item_id": "1", "score": 0.85, "rationale": {"personal": "...", "directive": "...", "trend": "..."}},
+    {"item_id": "2", "score": 0.40, "rationale": {"personal": "...", "directive": "...", "trend": "..."}}
+  ]
+}

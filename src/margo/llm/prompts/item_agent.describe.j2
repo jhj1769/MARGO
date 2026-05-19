@@ -1,0 +1,24 @@
+## Active directive
+{{ directive.natural_language }}
+Structured: {{ directive.structured_constraints | tojson }}
+
+## Trend signal
+{% if trend -%}
+{{ trend.summary }} (rising: {{ trend.keywords | join(", ") }})
+{% else -%}
+(no trend signal)
+{% endif %}
+
+## User snapshot
+{{ user_profile }}
+
+Write ONE compelling self-description (≤60 words) that re-frames the
+item for THIS user under the active directive + trend.
+Then declare an audience-fit score in [0,1].
+
+Return JSON:
+{
+  "description": "...",
+  "audience_fit": 0.0,
+  "anchored_attributes": ["...", "..."]    # the attributes you actually used
+}

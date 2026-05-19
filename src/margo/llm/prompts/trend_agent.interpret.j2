@@ -1,0 +1,24 @@
+## Raw evidence
+{% for src in sources -%}
+[{{ loop.index }}] {{ src.url }}
+{{ src.snippet }}
+---
+{% endfor %}
+
+Distil the evidence into a MARGO TrendInterpretation. Be conservative:
+do not mention brands/silhouettes/colours that don't appear in the
+evidence.
+
+Return JSON:
+{
+  "domain": "{{ domain }}",
+  "time_window": "{{ time_window }}",
+  "summary": "...",                 # ≤ 2 sentences
+  "keywords": ["..."],             # 3–8 short tags
+  "rising_attributes": {            # use the supplied vocabulary keys
+    "color": ["..."],
+    "silhouette": ["..."],
+    "material": ["..."]
+  },
+  "raw_sources": [{{ sources | map(attribute='url') | list | tojson }}]
+}

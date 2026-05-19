@@ -7,11 +7,11 @@ build/
 dist/
 .eggs/
 
-# --- Virtualenvs ---
+# --- Virtualenvs (repo root only; do not match src/margo package) ---
 .venv/
 venv/
-margo/
-sage/
+/margo/
+/sage/
 env/
 
 # --- Env files ---

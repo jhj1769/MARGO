@@ -1,0 +1,17 @@
+You will receive a USER'S interaction history (titles + key attributes).
+Synthesise a compact NL persona — the kind of summary a personal shopper
+would jot down before recommending something.
+
+Cover, in 4–6 sentences:
+- typical categories / silhouettes / colours,
+- approximate price band the user has actually paid for,
+- noticeable style direction (e.g. minimalist, streetwear, formal),
+- any preferred materials or brands if clearly visible,
+- explicit unknowns ("price sensitivity unclear", etc.) — do NOT fabricate.
+
+## History (most recent {{ history[-40:] | length }} of {{ history | length }} interactions)
+{% for h in history[-40:] -%}
+- {{ h }}
+{% endfor %}
+
+Return ONLY a JSON object: {"profile": "...", "preferred_price_band": "..."}.
