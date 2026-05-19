@@ -1,0 +1,60 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+build/
+dist/
+.eggs/
+
+# --- Virtualenvs ---
+.venv/
+venv/
+margo/
+sage/
+env/
+
+# --- Env files ---
+.env
+.env.*
+!.env.example
+
+# --- Data & artifacts (never commit) ---
+data/
+**/processed/
+**/*.parquet
+**/*.npy
+**/*.bin
+**/*.faiss
+**/*.jsonl
+**/*.jsonl.gz
+**/*.pkl
+**/*.ckpt
+
+# --- Logs / nohup ---
+logs/
+*.log
+nohup.out
+
+# --- Caches ---
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# --- Node / Next.js ---
+node_modules/
+.next/
+.next/**
+*.tsbuildinfo
+next-env.d.ts
+
+# --- Editor / OS ---
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*~
+
+# --- Documents not for repo ---
+*.pdf

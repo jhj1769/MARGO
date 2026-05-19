@@ -1,0 +1,40 @@
+# --- Core ----------------------------------------------------------------
+torch>=2.1.0
+numpy>=1.24.0
+pandas>=2.0.0
+pyarrow>=14.0.0
+pyyaml>=6.0
+tqdm>=4.65.0
+python-dotenv>=1.0.0
+
+# --- Validation / typing -------------------------------------------------
+pydantic>=2.5.0
+jinja2>=3.1.2
+
+# --- LLM / Orchestration -------------------------------------------------
+openai>=1.30.0          # OpenAI client (also used to talk to vLLM)
+langgraph>=0.0.40       # State-machine for 4-phase lifecycle
+langchain-core>=0.1.0   # Message primitives
+tenacity>=8.2.0         # Retry on LLM errors
+
+# --- Retrieval (Step 2-3) ------------------------------------------------
+FlagEmbedding>=1.2.10   # BGE-M3
+faiss-cpu>=1.7.4        # swap to faiss-gpu in your env if available
+rank-bm25>=0.2.2
+sentence-transformers>=2.5.0
+
+# --- Web search for Trend Agent -----------------------------------------
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+# tavily-python>=0.3.0  # uncomment after `pip install tavily-python`
+
+# --- Web demo backend (optional) ----------------------------------------
+fastapi>=0.110.0
+uvicorn[standard]>=0.27.0
+websockets>=12.0
+
+# --- Dev / testing -------------------------------------------------------
+pytest>=8.0.0
+pytest-asyncio>=0.23.0
+ruff>=0.3.0
+ipython>=8.20.0

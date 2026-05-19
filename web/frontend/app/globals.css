@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --grid-line: rgba(15, 27, 45, 0.06);
+  }
+
+  html, body {
+    @apply bg-paper text-ink font-sans antialiased;
+    font-feature-settings: "ss01", "ss02", "cv11";
+  }
+
+  ::selection {
+    background: #C4664E;
+    color: #FAF8F4;
+  }
+
+  h1, h2, h3, .display {
+    @apply font-display tracking-editorial;
+  }
+
+  /* subtle grain on light surfaces */
+  .grain::before {
+    content: "";
+    position: absolute; inset: 0;
+    background-image: radial-gradient(rgba(0,0,0,.05) 1px, transparent 1px);
+    background-size: 3px 3px;
+    pointer-events: none;
+    opacity: .25;
+    mix-blend-mode: multiply;
+  }
+}
+
+@layer components {
+  .container-narrow {
+    @apply mx-auto max-w-6xl px-6 lg:px-10;
+  }
+
+  .container-wide {
+    @apply mx-auto max-w-[1480px] px-6 lg:px-10;
+  }
+
+  .hairline {
+    @apply border-ink/10;
+  }
+
+  .eyebrow {
+    @apply text-[11px] uppercase tracking-wider2 text-ash font-medium;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border hairline bg-paper/60 px-2.5 py-1 text-xs font-medium text-ink/80;
+  }
+
+  .chip-solid {
+    @apply inline-flex items-center gap-1.5 rounded-full bg-ink px-2.5 py-1 text-xs font-medium text-paper;
+  }
+
+  .surface {
+    @apply bg-sand/40 border hairline rounded-2xl;
+  }
+
+  .card {
+    @apply relative bg-paper border hairline rounded-2xl overflow-hidden;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition;
+  }
+
+  .btn-primary {
+    @apply btn bg-ink text-paper hover:bg-ink/90;
+  }
+
+  .btn-ghost {
+    @apply btn border hairline text-ink hover:bg-ink/5;
+  }
+
+  .btn-terracotta {
+    @apply btn bg-terracotta text-paper hover:bg-terracotta/90;
+  }
+
+  /* page background grid */
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+}
+
+/* scrollbar (webkit) */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(15, 27, 45, 0.18);
+  border-radius: 999px;
+  border: 2px solid #FAF8F4;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(15, 27, 45, 0.32); }
