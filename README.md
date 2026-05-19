@@ -7,9 +7,6 @@ MARGO는 기존 추천 시스템의 *User–Item 2-stakeholder* 구조를
 운영자(MD/PM)의 자연어 운영 의도와 외부 트렌드 맥락을 추천 과정에
 직접 통합하는 LLM Multi-Agent Framework입니다.
 
-> 자세한 동기·구조·실험 설계는 [`MARGO_Implementation_Plan.md`](./MARGO_Implementation_Plan.md) 참고.  
-> 지금까지의 연구 내용 요약은 [`RESEARCH_SUMMARY.md`](./RESEARCH_SUMMARY.md) 참고.
-
 ---
 
 ## 1. 4-Stakeholder Multi-Agent

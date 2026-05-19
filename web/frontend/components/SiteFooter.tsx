@@ -16,7 +16,16 @@ export function SiteFooter() {
             <li><a className="hover:text-terracotta" href="/architecture">Framework Diagram</a></li>
             <li><a className="hover:text-terracotta" href="/demo">Interactive Demo</a></li>
             <li><a className="hover:text-terracotta" href="#paper">Paper (preprint)</a></li>
-            <li><a className="hover:text-terracotta" href="#">Code · GitHub</a></li>
+            <li>
+              <a
+                className="hover:text-terracotta"
+                href="https://github.com/jhj1769/MARGO"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Code · GitHub
+              </a>
+            </li>
           </ul>
         </div>
 

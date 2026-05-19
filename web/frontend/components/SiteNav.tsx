@@ -46,7 +46,7 @@ export function SiteNav() {
             );
           })}
           <a
-            href="https://github.com/"
+            href="https://github.com/jhj1769/MARGO"
             target="_blank"
             rel="noreferrer"
             className="ml-2 hidden sm:inline-flex btn-ghost h-8 px-3 text-xs"
