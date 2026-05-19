@@ -22,12 +22,12 @@ from typing import Any
 
 import pandas as pd
 
-from margo.api import MargoEngine, MargoEngineConfig
-from margo.domains.fashion.loader import load_processed
-from margo.evaluation.governance import dcr, tas
-from margo.evaluation.grounding import cadr, ihr, svr_from_validator, vdr
-from margo.evaluation.standard import hit_rate, mean, ndcg
-from margo.lifecycle.orchestrator import MargoRunConfig
+from api import MargoEngine, MargoEngineConfig
+from domains.fashion.loader import load_processed
+from evaluation.governance import dcr, tas
+from evaluation.grounding import cadr, ihr, svr_from_validator, vdr
+from evaluation.standard import hit_rate, mean, ndcg
+from lifecycle.orchestrator import MargoRunConfig
 
 log = logging.getLogger(__name__)
 

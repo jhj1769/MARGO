@@ -37,14 +37,14 @@ from pathlib import Path
 
 import pandas as pd
 
-from margo.grounding.trend_snapshot_schema import (
+from grounding.trend_snapshot_schema import (
     CategoryTrend,
     RisingQuery,
     TrendSnapshot,
 )
-from margo.llm import get_default_client
-from margo.trend_sources.google_trends import GoogleTrendsClient, classify_keywords
-from margo.trend_sources.keyword_pool import (
+from llm import get_default_client
+from trend_sources.google_trends import GoogleTrendsClient, classify_keywords
+from trend_sources.keyword_pool import (
     build_keyword_pool,
     map_keywords_to_categories,
 )

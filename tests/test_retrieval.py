@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from margo.retrieval.bm25_retriever import BM25Retriever
+from retrieval.bm25_retriever import BM25Retriever
 
 
 def test_bm25_returns_correct_top_hit():

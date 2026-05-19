@@ -25,7 +25,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from margo.domains.fashion.loader import build_item_text
+from domains.fashion.loader import build_item_text
 
 log = logging.getLogger(__name__)
 

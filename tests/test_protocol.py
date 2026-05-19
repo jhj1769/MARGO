@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from margo.protocol import (
+from protocol import (
     Directive,
     Message,
     MessageType,

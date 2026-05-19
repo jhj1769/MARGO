@@ -1,6 +1,6 @@
 """Price coercion for Amazon meta rows."""
 
-from margo.domains.fashion.loader import coerce_price, sanitize_items_frame
+from domains.fashion.loader import coerce_price, sanitize_items_frame
 import pandas as pd
 
 

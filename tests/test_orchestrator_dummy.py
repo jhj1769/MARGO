@@ -10,15 +10,15 @@ import os
 
 os.environ.setdefault("MARGO_LLM_BACKEND", "dummy")
 
-from margo.agents.expert_agent import ExpertAgent
-from margo.agents.item_agent import ItemFacts
-from margo.agents.trend_agent import TrendAgent
-from margo.agents.user_agent import UserAgent
-from margo.grounding.vocabulary import Vocabulary
-from margo.lifecycle.orchestrator import MargoOrchestrator, MargoRunConfig
-from margo.llm import LLMClient
-from margo.protocol.router import MessageBus
-from margo.retrieval.bm25_retriever import BM25Retriever
+from agents.expert_agent import ExpertAgent
+from agents.item_agent import ItemFacts
+from agents.trend_agent import TrendAgent
+from agents.user_agent import UserAgent
+from grounding.vocabulary import Vocabulary
+from lifecycle.orchestrator import MargoOrchestrator, MargoRunConfig
+from llm import LLMClient
+from protocol.router import MessageBus
+from retrieval.bm25_retriever import BM25Retriever
 
 
 def _build_catalog():

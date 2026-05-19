@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from margo.evaluation.governance import dcr, tas
-from margo.evaluation.grounding import ihr, vdr
-from margo.evaluation.standard import hit_rate, ndcg
-from margo.grounding.vocabulary import Vocabulary
-from margo.protocol.messages import (
+from evaluation.governance import dcr, tas
+from evaluation.grounding import ihr, vdr
+from evaluation.standard import hit_rate, ndcg
+from grounding.vocabulary import Vocabulary
+from protocol.messages import (
     Directive,
     RankedItem,
     Rationale,

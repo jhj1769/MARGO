@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from margo.grounding.schema_validator import SchemaValidator
-from margo.grounding.snapshot import TrendSnapshotStore
-from margo.grounding.vocabulary import Vocabulary
-from margo.protocol.messages import TrendInterpretation
+from grounding.schema_validator import SchemaValidator
+from grounding.snapshot import TrendSnapshotStore
+from grounding.vocabulary import Vocabulary
+from protocol.messages import TrendInterpretation
 
 
 def test_vocabulary_check_text():

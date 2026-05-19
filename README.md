@@ -36,7 +36,7 @@ Phase 4             : Validation & Refinement
 ## 3. 빠른 시작
 
 ```bash
-# 0) 가상환경 (프로젝트 루트의 `margo/` — 패키지 `src/margo`와 별개)
+# 0) 가상환경 (프로젝트 루트의 `margo/` — `src/` 소스와 별개)
 python3 -m venv margo
 source margo/bin/activate
 pip install -r requirements.txt
@@ -60,7 +60,7 @@ python -m scripts.evaluate --processed-dir data/Amazon\ Fashion/processed --k 10
 ## 4. 디렉토리
 
 ```
-src/margo/
+src/
 ├── agents/         # base + user/item/expert/trend
 ├── protocol/       # Pydantic message schema + router
 ├── lifecycle/      # 4-phase orchestration
@@ -70,7 +70,8 @@ src/margo/
 ├── trend_sources/  # web search (Tavily / stub)
 ├── evaluation/     # NDCG/HR + DCR/TAS + IHR/VDR/CADR/SVR
 ├── domains/        # fashion personas / vocabulary / loader
-└── baselines/      # LightGCN, AgentCF, MACF
+├── baselines/      # LightGCN, AgentCF, MACF
+└── api.py          # public MargoEngine façade
 web/
 ├── backend/        # FastAPI · /api + /ws/trace · mock fallback
 └── frontend/       # Next.js 14 + Tailwind · landing / architecture / demo

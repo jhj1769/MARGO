@@ -22,8 +22,8 @@ import logging
 import time
 from pathlib import Path
 
-from margo.api import MargoEngine, MargoEngineConfig
-from margo.lifecycle.orchestrator import MargoRunConfig
+from api import MargoEngine, MargoEngineConfig
+from lifecycle.orchestrator import MargoRunConfig
 
 
 def parse_args() -> argparse.Namespace:

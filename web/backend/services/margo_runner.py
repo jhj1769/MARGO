@@ -1,6 +1,6 @@
 """High-level façade used by the web routes.
 
-In *engine* mode this wraps :class:`margo.api.MargoEngine` and translates
+In *engine* mode this wraps :class:`api.MargoEngine` and translates
 its outputs into JSON-serialisable dicts. In *mock* mode it serves
 hand-crafted demo data so the UI can be developed against a live
 backend even without a GPU.
@@ -19,7 +19,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Optional
 
-# Make the in-repo `src/margo` import work without installing the package.
+# Make the in-repo `src/` packages importable without installing the package.
 _REPO_ROOT = Path(__file__).resolve().parents[3]
 if str(_REPO_ROOT / "src") not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT / "src"))
@@ -84,7 +84,7 @@ class MargoRunner:
             log.info("Forced mock mode via MARGO_DEMO_MODE=mock")
             return cls(mode="mock")
         try:
-            from margo.api import MargoEngine, MargoEngineConfig  # type: ignore
+            from api import MargoEngine, MargoEngineConfig  # type: ignore
 
             processed = os.getenv("MARGO_PROCESSED_DIR")
             if not processed:
@@ -280,7 +280,7 @@ class MargoRunner:
         k: int,
         emit,
     ) -> dict:
-        from margo.lifecycle.orchestrator import MargoRunConfig  # type: ignore
+        from lifecycle.orchestrator import MargoRunConfig  # type: ignore
 
         loop = asyncio.get_event_loop()
 
