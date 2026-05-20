@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from grounding.schema_validator import SchemaValidator
-from grounding.snapshot import TrendSnapshotStore
-from grounding.vocabulary import Vocabulary
-from protocol.messages import TrendInterpretation
+from core.validation.schema_validator import SchemaValidator
+from adapters.trends.snapshot import TrendSnapshotStore
+from core.validation.vocabulary import Vocabulary
+from core.protocol.messages import TrendInterpretation
 
 
 def test_vocabulary_check_text():

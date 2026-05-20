@@ -19,13 +19,13 @@ from pathlib import Path
 
 import pandas as pd
 
-from domains.fashion.loader import (
+from data.fashion.loader import (
     load_raw_pair,
     resume_items_and_vocab,
     standard_pipeline,
     write_processed,
 )
-from domains.fashion.vocabulary import build_fashion_vocabulary
+from data.fashion.vocabulary import build_fashion_vocabulary
 
 log = logging.getLogger(__name__)
 

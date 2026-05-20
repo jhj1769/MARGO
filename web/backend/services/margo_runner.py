@@ -280,7 +280,7 @@ class MargoRunner:
         k: int,
         emit,
     ) -> dict:
-        from lifecycle.orchestrator import MargoRunConfig  # type: ignore
+        from core.lifecycle.orchestrator import MargoRunConfig  # type: ignore
 
         loop = asyncio.get_event_loop()
 

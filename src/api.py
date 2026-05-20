@@ -14,20 +14,20 @@ from typing import Any, Optional
 
 import pandas as pd
 
-from agents.expert_agent import ExpertAgent
-from agents.item_agent import ItemFacts
-from agents.trend_agent import TrendAgent
-from agents.user_agent import UserAgent
-from domains.fashion.loader import load_processed
-from domains.fashion.personas import EXPERT_PERSONA
-from domains.fashion.vocabulary import build_attribute_table, build_fashion_vocabulary
-from grounding.schema_validator import SchemaValidator
-from grounding.snapshot import TrendSnapshotStore
-from grounding.vocabulary import Vocabulary
-from lifecycle.orchestrator import MargoOrchestrator, MargoRunConfig
-from llm import LLMClient, PromptRegistry, get_default_client
-from protocol.messages import RecommendationResult
-from protocol.router import MessageBus
+from core.agents.expert_agent import ExpertAgent
+from core.agents.item_agent import ItemFacts
+from core.agents.trend_agent import TrendAgent
+from core.agents.user_agent import UserAgent
+from data.fashion.loader import load_processed
+from data.fashion.personas import EXPERT_PERSONA
+from data.fashion.vocabulary import build_attribute_table, build_fashion_vocabulary
+from core.validation.schema_validator import SchemaValidator
+from adapters.trends.snapshot import TrendSnapshotStore
+from core.validation.vocabulary import Vocabulary
+from core.lifecycle.orchestrator import MargoOrchestrator, MargoRunConfig
+from adapters.llm import LLMClient, PromptRegistry, get_default_client
+from core.protocol.messages import RecommendationResult
+from core.protocol.router import MessageBus
 
 log = logging.getLogger(__name__)
 
@@ -142,15 +142,15 @@ class MargoEngine:
         if not cfg.bm25_only and index_path.exists() and ids_path.exists():
             import os
 
-            from retrieval.bge_retriever import BGERetriever
+            from adapters.retrieval.bge_retriever import BGERetriever
 
             item_ids = ids_path.read_text(encoding="utf-8").splitlines()
             log.info("Using BGE-M3 retriever (%d items)", len(item_ids))
             device = os.getenv("MARGO_BGE_DEVICE", "cuda:0")
             return BGERetriever(index_path=index_path, item_ids=item_ids, device=device)
 
-        from domains.fashion.loader import build_item_text
-        from retrieval.bm25_retriever import BM25Retriever
+        from data.fashion.loader import build_item_text
+        from adapters.retrieval.bm25_retriever import BM25Retriever
 
         log.warning("BGE-M3 index not found; falling back to BM25.")
         texts = [build_item_text(r) for _, r in items.iterrows()]

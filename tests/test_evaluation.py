@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from evaluation.governance import dcr, tas
-from evaluation.grounding import ihr, vdr
-from evaluation.standard import hit_rate, ndcg
-from grounding.vocabulary import Vocabulary
-from protocol.messages import (
+from eval.governance import dcr, tas
+from eval.grounding import ihr, vdr
+from eval.standard import hit_rate, ndcg
+from core.validation.vocabulary import Vocabulary
+from core.protocol.messages import (
     Directive,
     RankedItem,
     Rationale,

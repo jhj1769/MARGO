@@ -37,14 +37,14 @@ from pathlib import Path
 
 import pandas as pd
 
-from grounding.trend_snapshot_schema import (
+from adapters.trends.snapshot_schema import (
     CategoryTrend,
     RisingQuery,
     TrendSnapshot,
 )
-from llm import get_default_client
-from trend_sources.google_trends import GoogleTrendsClient, classify_keywords
-from trend_sources.keyword_pool import (
+from adapters.llm import get_default_client
+from adapters.trends.google_trends import GoogleTrendsClient, classify_keywords
+from adapters.trends.keyword_pool import (
     build_keyword_pool,
     map_keywords_to_categories,
 )

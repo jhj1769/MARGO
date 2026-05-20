@@ -57,21 +57,31 @@ python -m scripts.evaluate --processed-dir data/Amazon\ Fashion/processed --k 10
 ## 4. 디렉토리
 
 ```
+prompts/                          # 단계별 Jinja2 프롬프트
+├── phase1_initialization/        # *.system.j2 (agent personas)
+├── phase2_directive/             # expert.directive, trend.interpret*
+├── phase3_reasoning/             # item.describe, user.profile, user.evaluate
+└── phase4_validation/            # expert.validate, expert.refine
+
 src/
-├── agents/         # base + user/item/expert/trend
-├── protocol/       # Pydantic message schema + router
-├── lifecycle/      # 4-phase orchestration
-├── grounding/      # vocabulary / schema validator / snapshot cache
-├── retrieval/      # BGE-M3, BM25, LightGCN
-├── llm/            # unified LLM client + jinja prompts
-├── trend_sources/  # web search (Tavily / stub)
-├── evaluation/     # NDCG/HR + DCR/TAS + IHR/VDR/CADR/SVR
-├── domains/        # fashion personas / vocabulary / loader
-├── baselines/      # LightGCN, AgentCF, MACF
-└── api.py          # public MargoEngine façade
+├── api.py                        # public MargoEngine façade
+├── core/                         # 엔진 본체
+│   ├── agents/                   # base + user / item / expert / trend
+│   ├── lifecycle/                # 4-phase orchestrator
+│   ├── protocol/                 # Pydantic message schema + router
+│   └── validation/               # vocabulary drift / schema violations (VDR/SVR)
+├── adapters/                     # 외부 시스템 어댑터
+│   ├── llm/                      # unified LLM client + PromptRegistry
+│   ├── retrieval/                # BGE-M3, BM25
+│   └── trends/                   # web search · Google Trends · snapshot cache
+├── data/                         # 도메인 데이터 / 로더
+│   └── fashion/                  # personas · vocabulary · loader
+├── eval/                         # NDCG/HR · DCR/TAS · IHR/VDR/CADR/SVR
+└── baselines/                    # LightGCN, AgentCF, MACF
+
 web/
-├── backend/        # FastAPI · /api + /ws/trace · mock fallback
-└── frontend/       # Next.js 14 + Tailwind · landing / architecture / demo
+├── backend/                      # FastAPI · /api + /ws/trace · mock fallback
+└── frontend/                     # Next.js 14 + Tailwind · landing / architecture / demo
 ```
 
 ## 5. 웹 데모 실행

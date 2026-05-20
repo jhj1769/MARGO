@@ -14,7 +14,7 @@ from typing import Optional, Sequence
 
 import numpy as np
 
-from retrieval.base import RetrievalHit
+from adapters.retrieval.base import RetrievalHit
 
 log = logging.getLogger(__name__)
 

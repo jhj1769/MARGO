@@ -23,11 +23,11 @@ from typing import Any
 import pandas as pd
 
 from api import MargoEngine, MargoEngineConfig
-from domains.fashion.loader import load_processed
-from evaluation.governance import dcr, tas
-from evaluation.grounding import cadr, ihr, svr_from_validator, vdr
-from evaluation.standard import hit_rate, mean, ndcg
-from lifecycle.orchestrator import MargoRunConfig
+from data.fashion.loader import load_processed
+from eval.governance import dcr, tas
+from eval.grounding import cadr, ihr, svr_from_validator, vdr
+from eval.standard import hit_rate, mean, ndcg
+from core.lifecycle.orchestrator import MargoRunConfig
 
 log = logging.getLogger(__name__)
 
