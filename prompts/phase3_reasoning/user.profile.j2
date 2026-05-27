@@ -1,17 +1,35 @@
-You will receive a USER'S interaction history (titles + key attributes).
-Synthesise a compact NL persona — the kind of summary a personal shopper
-would jot down before recommending something.
+You will receive a USER'S interaction history (titles + key attributes) and
+three deterministic axes already computed from the same history.
 
-Cover, in 4–6 sentences:
-- typical categories / silhouettes / colours,
-- approximate price band the user has actually paid for,
-- noticeable style direction (e.g. minimalist, streetwear, formal),
-- any preferred materials or brands if clearly visible,
-- explicit unknowns ("price sensitivity unclear", etc.) — do NOT fabricate.
+Two jobs:
+
+1. Synthesise a compact NL persona — the kind of summary a personal shopper
+   would jot down before recommending something. 4–6 sentences, covering
+   typical categories / silhouettes / colours, the precomputed price band,
+   style direction, materials/brands if visible, and explicit unknowns
+   ("price sensitivity unclear", etc.) — do NOT fabricate.
+
+2. Infer the STYLE axis (and only the style axis). Read the item descriptions
+   and produce a single style label (e.g. "minimal-casual", "streetwear",
+   "preppy", "feminine-romantic", "athleisure", or "mixed" when no single
+   direction dominates).
+
+## Precomputed deterministic axes (do not override)
+{% for axis in deterministic_axes -%}
+- {{ axis.name }}: value="{{ axis.value }}" (confidence={{ axis.confidence }}, evidence={{ axis.evidence | join('; ') }})
+{% endfor %}
 
 ## History (most recent {{ history[-40:] | length }} of {{ history | length }} interactions)
 {% for h in history[-40:] -%}
 - {{ h }}
 {% endfor %}
 
-Return ONLY a JSON object: {"profile": "...", "preferred_price_band": "..."}.
+Return ONLY a JSON object with this shape:
+{
+  "profile": "<4-6 sentence NL persona>",
+  "preferred_price_band": "<one of: budget, mid-tier, premium-open, luxury-aware, mixed>",
+  "style_value": "<style label or 'mixed'>",
+  "style_confidence": <float in [0,1]>,
+  "style_evidence": ["<short phrase>", "..."],
+  "style_secondary_values": ["<optional secondary style labels>"]
+}

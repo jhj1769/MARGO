@@ -188,6 +188,113 @@ def harvest_rising_keywords(
 
 
 # --------------------------------------------------------------------------- #
+# Curated fashion trend lexicon (Enhancement 4 — L5 priming set)              #
+# --------------------------------------------------------------------------- #
+#
+# Hand-picked, contemporary trend-bearing terms that catalog tail-categories
+# usually miss. Editorial trade press tracks these explicitly; including them
+# in the pool is what surfaces *micro-trend* signal (rising/declining) in the
+# snapshot. Sourced from 2022-2023 Vogue / WWD / BoF / Highsnobiety coverage.
+
+FASHION_TREND_LEXICON: list[str] = [
+    # Aesthetics / cores (2022-2023 wave)
+    "y2k", "y2k revival", "quiet luxury", "old money", "stealth wealth",
+    "coastal grandmother", "tomato girl", "mob wife", "blokecore", "balletcore",
+    "gorpcore", "cottagecore", "dark academia", "preppy", "soft girl",
+    "indie sleaze", "regencycore", "office siren", "clean girl",
+    # Silhouettes / cuts
+    "low rise", "high waist", "wide leg", "cargo pants", "parachute pants",
+    "barrel jeans", "baggy jeans", "skinny jeans", "boyfriend jeans",
+    "corset", "bustier", "crop top", "tube top", "mini skirt", "maxi skirt",
+    "midi dress", "slip dress", "tea length", "bodycon", "bias cut",
+    # Outerwear
+    "oversized blazer", "tailored blazer", "trench coat", "puffer jacket",
+    "barn jacket", "varsity jacket", "leather jacket",
+    # Materials / details
+    "satin", "velvet", "denim", "tweed", "knit", "crochet", "mesh", "sheer",
+    "metallic", "chrome", "lace", "linen", "shearling", "faux fur",
+    # Footwear
+    "ballet flats", "kitten heels", "platform shoes", "chunky sneakers",
+    "dad sneakers", "samba", "loafers", "mary janes", "knee high boots",
+    "cowboy boots", "uggs", "flip flops",
+    # Accessories
+    "shoulder bag", "tote bag", "micro bag", "baguette bag", "bucket hat",
+    "claw clip", "statement necklace", "stack rings", "pearl necklace",
+    "chunky gold",
+    # Brands / motifs in the trade press
+    "miu miu", "the row", "alaia", "khaite", "loewe", "bottega", "prada",
+    "gucci", "balenciaga", "celine", "saint laurent", "chanel",
+    "supreme", "stussy", "carhartt", "patagonia", "uniqlo", "zara",
+    # Movements
+    "slow fashion", "secondhand", "vintage", "archive", "deadstock",
+    "upcycle", "circular fashion",
+    # Tech / cross-over
+    "smart watch", "techwear", "athleisure",
+]
+
+
+class _BriefKeywords(BaseModel):
+    keywords: list[str] = Field(default_factory=list)
+
+
+def extract_brief_keywords(
+    llm,
+    brief_text: str,
+    *,
+    max_keywords: int = 20,
+    domain: str = "fashion",
+) -> list[str]:
+    """LLM-extract fashion-relevant keywords from an operator brief.
+
+    The brief is short free-form text from the operator (e.g. "Casual to
+    formal upsell, boost outerwear, lean into Y2K revival"). We want the
+    concrete trend-bearing terms — not abstract marketing phrases.
+
+    Returns lower-cased, deduplicated, length-capped phrases. Empty list
+    on failure (brief still works without brief-derived keywords).
+    """
+    if not brief_text or not brief_text.strip():
+        return []
+
+    prompt = (
+        f"You are a {domain} trend analyst. Extract concrete trend-bearing "
+        "keywords from the operator brief below.\n\n"
+        f"Brief: {brief_text}\n\n"
+        "Rules:\n"
+        "- Lowercase, 2-4 words each, search-engine-friendly.\n"
+        "- Prefer concrete fashion terms (silhouettes, materials, eras, "
+        "styles, brands) over abstract marketing language.\n"
+        "- Drop generic words like 'trendy' or 'fresh'.\n"
+        f"- Cap at {max_keywords} keywords.\n"
+        "Return ONLY {\"keywords\": [...]}.\n"
+    )
+    try:
+        out = llm.complete_structured(
+            prompt,
+            _BriefKeywords,
+            system="You output strict JSON. No prose.",
+            agent_id="trend-brief-keywords",
+        )
+    except Exception as e:
+        log.warning("brief keyword extraction failed: %s", e)
+        return []
+
+    cleaned: list[str] = []
+    seen: set[str] = set()
+    for kw in out.keywords:
+        term = re.sub(r"\s+", " ", str(kw).strip().lower())
+        if not term or term in seen:
+            continue
+        if len(term.split()) > 5 or len(term) > 40:
+            continue
+        seen.add(term)
+        cleaned.append(term)
+        if len(cleaned) >= max_keywords:
+            break
+    return cleaned
+
+
+# --------------------------------------------------------------------------- #
 # Orchestrator                                                                 #
 # --------------------------------------------------------------------------- #
 
@@ -196,12 +303,17 @@ class KeywordPool(BaseModel):
     catalog: list[str] = Field(default_factory=list)
     llm_seed: list[str] = Field(default_factory=list)
     rising_feedback: list[str] = Field(default_factory=list)
+    # Enhancement 4: operator brief drives part of the pool. Stays empty
+    # for the legacy single-source pipeline.
+    brief_derived: list[str] = Field(default_factory=list)
 
     @property
     def all(self) -> list[str]:
         seen: set[str] = set()
         out: list[str] = []
-        for src in (self.catalog, self.llm_seed, self.rising_feedback):
+        # Brief-derived keywords come first — they capture operator intent
+        # which is the most directly relevant signal for downstream Phase 2.
+        for src in (self.brief_derived, self.catalog, self.llm_seed, self.rising_feedback):
             for kw in src:
                 if kw not in seen:
                     seen.add(kw)
@@ -209,8 +321,10 @@ class KeywordPool(BaseModel):
         return out
 
     def source_lookup(self) -> dict[str, str]:
-        """Map keyword → its origin source ('catalog' | 'llm_seed' | 'rising_feedback')."""
+        """Map keyword → its origin source."""
         out: dict[str, str] = {}
+        for kw in self.brief_derived:
+            out.setdefault(kw, "brief_derived")
         for kw in self.catalog:
             out.setdefault(kw, "catalog")
         for kw in self.llm_seed:

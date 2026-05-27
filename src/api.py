@@ -12,14 +12,23 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Optional
 
+from dotenv import load_dotenv
+
+load_dotenv(Path(__file__).resolve().parents[1] / ".env")
+
 import pandas as pd
 
 from core.agents.expert_agent import ExpertAgent
 from core.agents.item_agent import ItemFacts
 from core.agents.trend_agent import TrendAgent
 from core.agents.user_agent import UserAgent
+from data.fashion.gender import (
+    aggregate_user_gender,
+    build_item_gender_lookup,
+)
 from data.fashion.loader import load_processed
 from data.fashion.personas import EXPERT_PERSONA
+from data.fashion.rejected_loader import load_rejected_history
 from data.fashion.vocabulary import build_attribute_table, build_fashion_vocabulary
 from core.validation.schema_validator import SchemaValidator
 from adapters.trends.snapshot import TrendSnapshotStore
@@ -40,6 +49,10 @@ class MargoEngineConfig:
     expert_persona: str = EXPERT_PERSONA
     snapshot_dir: Optional[Path] = None
     bm25_only: bool = False  # set True when BGE-M3 is not yet built
+    # Phase B+ agentic memory root. When set, per-entity JSONL stores are
+    # written under <memory_root>/{item,user,trend,expert}/. When None,
+    # all agents use NullMemory (v3 behaviour) — backward compatible.
+    memory_root: Optional[Path] = None
 
 
 class MargoEngine:
@@ -65,6 +78,18 @@ class MargoEngine:
             )
 
         self.vocabulary: Vocabulary = build_fashion_vocabulary(tables.items)
+        # Keep the raw items DataFrame around so each on-demand UserAgent can
+        # compute its deterministic preference axes (Enhancement 1) without
+        # re-reading parquet.
+        self._items_df = tables.items
+
+        # One-shot per-item gender classification (women / men / kids /
+        # unisex / unknown). Used as a Phase 3 candidate filter, NOT as a
+        # 5th preference axis — gender is categorical, not aesthetic, so
+        # mismatches are type errors that should be filtered before rerank.
+        self._item_gender_lookup = build_item_gender_lookup(tables.items)
+        # Lazily filled in recommend(): user_id -> dominant gender focus.
+        self._user_gender_focus_cache: dict[str, str] = {}
 
         # Retriever — BGE by default, BM25 as cheap fallback.
         self.retriever = self._build_retriever(cfg, tables.items)
@@ -76,17 +101,22 @@ class MargoEngine:
         self.expert = ExpertAgent(
             persona=cfg.expert_persona,
             vocabulary={k: sorted(v) for k, v in self.vocabulary.buckets.items()},
+            persona_id=cfg.domain,  # one expert memory per domain by default
+            memory_root=cfg.memory_root,
             llm=self.llm,
             prompts=self.prompts,
             bus=self.bus,
             schema_validator=self.validator,
         )
+        # v5 season snapshots live at
+        # ``<processed_dir>/trend_cache/fashion_trend_<year>_<SS|FW>.json``.
+        # The TrendAgent's loader expects the processed_dir (parent of trend_cache).
         self.trend = TrendAgent(
             domain=cfg.domain,
             time_window=cfg.time_window,
             vocabulary=self.vocabulary,
             snapshot_store=snapshot_store,
-            gtrends_snapshot_dir=cfg.snapshot_dir,
+            processed_dir=cfg.processed_dir,
             llm=self.llm,
             prompts=self.prompts,
             bus=self.bus,
@@ -99,7 +129,10 @@ class MargoEngine:
             retriever=self.retriever,
             catalog=self.catalog,
             item_attrs=self.item_attrs,
+            item_gender_lookup=self._item_gender_lookup,
             bus=self.bus,
+            processed_dir=cfg.processed_dir,
+            memory_root=cfg.memory_root,
         )
 
         # User histories are looked up lazily by user_id. The NL-string list
@@ -108,6 +141,10 @@ class MargoEngine:
         self._user_histories, self._user_history_items = _build_user_history_table(
             tables.train, tables.items
         )
+        # Phase C — Rejected layer (rating 1-2). Maps user_id → list[item_id].
+        # Empty dict when rejected.parquet hasn't been built yet → Rejected
+        # layer becomes a no-op for every user (legacy behaviour).
+        self._rejected_history = load_rejected_history(cfg.processed_dir)
 
     # ------------------------------------------------------------------ #
     # Public                                                              #
@@ -119,17 +156,84 @@ class MargoEngine:
         brief: str,
         *,
         config: Optional[MargoRunConfig] = None,
+        as_of_date: Optional[str] = None,
     ) -> RecommendationResult:
+        """Run a single recommendation.
+
+        ``as_of_date`` (ISO ``YYYY-MM-DD``) anchors the trend snapshot to a
+        specific point in time. The engine resolves it to the monthly snapshot
+        whose window ends in that month, so a March-2023 test point sees the
+        ``2023-03`` snapshot, a September one sees ``2023-09``, etc. Falls
+        back to the engine's configured ``time_window`` when ``None``.
+        """
+        cfg = config or MargoRunConfig()
         history = self._user_histories.get(user_id, [])
+        history_item_ids = self._user_history_items.get(user_id, [])
+
+        # Ablation flags (v3 §9.4) gate the inputs handed to the UserAgent so
+        # that disabled enhancements degrade to their pre-enhancement behaviour
+        # without code changes.
+        items_df_in = self._items_df if cfg.enable_multi_axis else None
+        history_item_ids_in = history_item_ids if cfg.enable_multi_axis else None
+        # Peer signal requires axis + cohort signature, so disabling
+        # multi_axis also disables peer signal regardless of flag.
+        processed_dir_in = (
+            self.cfg.processed_dir
+            if (cfg.enable_peer_signal and cfg.enable_multi_axis)
+            else None
+        )
+        # Phase C — Rejected layer. Drops out when ablated, when the file
+        # wasn't built, or when this specific user has no rejected items.
+        rejected_in = (
+            self._rejected_history.get(user_id)
+            if cfg.enable_rejected_layer
+            else None
+        )
+
+        # Trend snapshot ablation toggle. When False, the agent skips the v5
+        # season snapshot path and falls through to live web search.
+        self.trend._ablate_snapshot = not cfg.enable_trend_snapshot  # noqa: SLF001
+        # Per-call time_window from as_of_date so monthly snapshots are picked
+        # to match the test point's month.
+        if as_of_date:
+            self.trend.set_runtime_time_window(_resolve_time_window(as_of_date))
+        else:
+            self.trend.set_runtime_time_window(None)
+
         user = UserAgent(
             user_id=user_id,
             history=history,
+            history_item_ids=history_item_ids_in,
+            items_df=items_df_in,
+            processed_dir=processed_dir_in,
+            rejected_item_ids=rejected_in,
             llm=self.llm,
             prompts=self.prompts,
             bus=self.bus,
             schema_validator=self.validator,
         )
-        return self.orchestrator.recommend(user, brief=brief, config=config)
+
+        # Pre-compute user gender focus (cached). Not a preference axis —
+        # this is used purely as a Phase 3 candidate filter. Falls back to
+        # "unknown" when the user has no history or no gendered items.
+        if user_id in self._user_gender_focus_cache:
+            user_gender_focus = self._user_gender_focus_cache[user_id]
+        else:
+            user_gender_focus = aggregate_user_gender(
+                history_item_ids, self._item_gender_lookup,
+            )
+            self._user_gender_focus_cache[user_id] = user_gender_focus
+        log.info(
+            "Gender focus for user %s: %s (over %d history items)",
+            user_id, user_gender_focus, len(history_item_ids),
+        )
+
+        return self.orchestrator.recommend(
+            user,
+            brief=brief,
+            config=cfg,
+            user_gender_focus=user_gender_focus,
+        )
 
     # ------------------------------------------------------------------ #
     # Internals                                                            #
@@ -161,6 +265,20 @@ class MargoEngine:
 # --------------------------------------------------------------------------- #
 # Helpers                                                                      #
 # --------------------------------------------------------------------------- #
+
+
+def _resolve_time_window(as_of_iso: str) -> str:
+    """Map an ISO date (YYYY-MM-DD) to a monthly snapshot label (YYYY-MM).
+
+    Examples
+    --------
+    >>> _resolve_time_window("2023-03-15")
+    '2023-03'
+    >>> _resolve_time_window("2023-09-10")
+    '2023-09'
+    """
+    # Defensive parse — accept full ISO timestamps too.
+    return as_of_iso[:7]
 
 
 def _build_user_history_table(

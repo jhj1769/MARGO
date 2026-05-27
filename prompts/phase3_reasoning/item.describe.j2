@@ -12,13 +12,58 @@ Structured: {{ directive.structured_constraints | tojson }}
 ## User snapshot
 {{ user_profile }}
 
-Write ONE compelling self-description (≤60 words) that re-frames the
-item for THIS user under the active directive + trend.
-Then declare an audience-fit score in [0,1].
+{% if audience -%}
+## Your buyer aggregate (grounded evidence — use this in audience_fit_claim_nl)
+- Verified buyers: {{ audience.buyer_count }}
+- Median buyer history length: {{ audience.median_history_length }}
+- Average buyer median price: {{ audience.avg_price_history }}
+- Top categories among buyers: {{ audience.category_distribution }}
+- Top brands among buyers: {{ audience.brand_distribution }}
+{% if audience.dominant_cohorts -%}
+- Dominant buyer cohorts: {{ audience.dominant_cohorts | join("; ") }}
+{% endif -%}
+{% endif %}
 
-Return JSON:
-{
-  "description": "...",
-  "audience_fit": 0.0,
-  "anchored_attributes": ["...", "..."]    # the attributes you actually used
-}
+{% if past_reception -%}
+## Your autobiographical memory (past reception in THIS viewer's cohort)
+You have been recommended {{ past_reception.n }} time(s) to viewers in cohort
+``{{ past_reception.viewer_cohort }}`` and received an average score of
+**{{ past_reception.avg_score }}**.
+{% if past_reception.recent_rationales %}
+Recent reasons they gave:
+{% for r in past_reception.recent_rationales -%}
+- {{ r }}
+{% endfor -%}
+{% endif -%}
+Treat this as evidence for *how strongly* you can claim to serve this cohort.
+{% endif %}
+
+{% if claim_warning -%}
+## ⚠ Self-correction warning
+{{ claim_warning }}
+{% endif %}
+
+## Output requirements
+
+Produce ONE compelling self-description (≤60 words) that re-frames the item for
+THIS user under the active directive (and trend signal if any). Then add the
+structured grounding fields:
+
+1. ``description``           — the ≤60-word headline NL (always required).
+2. ``audience_fit``          — float in [0, 1] for this user.
+3. ``anchored_attributes``   — the item attributes you actually referenced.
+{% if audience %}
+4. ``audience_fit_claim_nl`` — one sentence claiming WHO you serve well,
+   grounded in the buyer aggregate above. Cite a concrete number.
+5. ``outlier_note_nl``       — optional. If a clear minority buyer cohort
+   appears, name it; otherwise omit.
+{% endif %}
+{% if has_trend %}
+6. ``trend_position``        — object describing how you sit vs. the trend:
+   - ``lifecycle``: one of ``rising | stable | declining | niche``
+   - ``alignment``: one of ``aligned | orthogonal | counter``
+   - ``value_proposition_nl`` REQUIRED when lifecycle="declining" or
+     alignment="counter" — otherwise omit.
+{% endif %}
+
+Return ONE JSON object matching the schema. Omit fields that are not applicable.

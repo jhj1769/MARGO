@@ -1,11 +1,14 @@
 """Backend-agnostic LLM client.
 
-Three back-ends are supported, selected via the ``MARGO_LLM_BACKEND``
+Four back-ends are supported, selected via the ``MARGO_LLM_BACKEND``
 environment variable:
 
 * ``openai``  — OpenAI public API.
 * ``vllm``    — Any OpenAI-compatible server (vLLM, LM Studio, …).
                 ``MARGO_VLLM_BASE_URL`` defaults to ``http://localhost:8000/v1``.
+* ``gemini``  — Google Gemini via its OpenAI-compatible endpoint
+                (``https://generativelanguage.googleapis.com/v1beta/openai/``).
+                Key read from ``GEMINI_API_KEY`` or ``GOOGLE_API_KEY``.
 * ``dummy``   — Deterministic offline echo client; used in unit tests so the
                 pipeline can be exercised without a GPU.
 
@@ -109,6 +112,19 @@ class LLMClient:
                 or "http://localhost:8000/v1",
                 # vLLM does not check the key but openai>=1.0 demands a non-empty string.
                 api_key=api_key or os.getenv("MARGO_VLLM_API_KEY") or "EMPTY",
+            )
+        elif self.backend == "gemini":
+            self.model = model or os.getenv("MARGO_LLM_MODEL") or "gemini-2.5-flash"
+            resolved_key = api_key or os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+            if not resolved_key:
+                raise LLMClientError(
+                    "Gemini backend requires GEMINI_API_KEY (or GOOGLE_API_KEY) to be set."
+                )
+            self._client = self._build_openai(
+                base_url=base_url
+                or os.getenv("MARGO_GEMINI_BASE_URL")
+                or "https://generativelanguage.googleapis.com/v1beta/openai/",
+                api_key=resolved_key,
             )
         elif self.backend == "dummy":
             self.model = model or "dummy"
@@ -373,15 +389,39 @@ def _extract_json_block(text: str) -> Any:
 def _dummy_structured_response(system_with_schema: str) -> str:
     """Build a JSON document that satisfies the schema embedded in `system`.
 
-    The implementation only knows how to fill ``string``, ``number``,
-    ``integer``, ``boolean``, ``array`` and ``object`` types — that covers
-    every schema used by MARGO agents.
+    The schema is appended by ``complete_structured`` after the literal
+    sentinel ``"JSON schema:\\n"``. We anchor on that sentinel and parse
+    the balanced ``{...}`` that follows it — earlier braces in the system
+    prompt (e.g. an item-agent persona that interpolates ``item.attributes
+    | tojson``) would otherwise confuse a greedy regex.
+
+    Only the type kinds MARGO actually uses are filled in: ``string``,
+    ``number``, ``integer``, ``boolean``, ``array``, ``object``.
     """
-    match = re.search(r"\{[\s\S]+\}", system_with_schema)
-    if not match:
+    marker = "JSON schema:\n"
+    anchor = system_with_schema.find(marker)
+    if anchor < 0:
+        return "{}"
+    body = system_with_schema[anchor + len(marker):]
+    # Walk brace depth to find the matching close.
+    start = body.find("{")
+    if start < 0:
+        return "{}"
+    depth = 0
+    end = -1
+    for i in range(start, len(body)):
+        ch = body[i]
+        if ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                end = i
+                break
+    if end < 0:
         return "{}"
     try:
-        schema = json.loads(match.group(0))
+        schema = json.loads(body[start : end + 1])
     except json.JSONDecodeError:
         return "{}"
     return json.dumps(_fill_schema(schema, schema), ensure_ascii=False)

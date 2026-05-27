@@ -11,6 +11,42 @@
 - (no trend signal available)
 {% endif %}
 
+## Your preference axes
+{% if axes -%}
+{% for axis in axes -%}
+- {{ axis.name }}: {{ axis.value }} (confidence={{ axis.confidence }}, source={{ axis.derived_from }}, stability={{ axis.stability }})
+{% if axis.stability is defined and axis.stability < 1.0 -%}
+  ⚠ Drift detected on this axis — your recent behaviour differs from the long-run pattern. Weight recent evidence higher.
+{% endif -%}
+{% endfor -%}
+{% else -%}
+- (axes not yet populated)
+{% endif %}
+
+{% if rejection_pattern -%}
+## Your rejected patterns (rating 1-2 history — what you ACTIVELY DISLIKE)
+- Rejected items: {{ rejection_pattern.n_rejected }} ({{ rejection_pattern.n_with_attrs }} matched in catalog)
+{% if rejection_pattern.top_categories -%}
+- Top rejected categories: {{ rejection_pattern.top_categories | join(", ") }}
+{% endif -%}
+{% if rejection_pattern.top_brands -%}
+- Top rejected brands: {{ rejection_pattern.top_brands | join(", ") }}
+{% endif -%}
+{% if rejection_pattern.style_hints -%}
+- Recurring tokens in rejected titles: {{ rejection_pattern.style_hints | join(", ") }}
+{% endif %}
+
+{% if policy_hint == "daily" -%}
+APPLY POLICY: This is a *daily* recommendation — apply rejected patterns STRICTLY. Any candidate matching a rejected category or brand should receive a substantial score penalty.
+{% elif policy_hint == "trend_push" -%}
+APPLY POLICY: This is a *trend-push* recommendation — apply rejected patterns SOFTLY. Trend signal weighs more here; only penalise strong matches against rejected patterns.
+{% elif policy_hint == "cohort_expansion" -%}
+APPLY POLICY: This is a *cohort-expansion* recommendation — apply rejected patterns LIGHTLY. Cohort peer signal dominates; penalise only when the rejected pattern is overwhelming.
+{% else -%}
+APPLY POLICY: No explicit policy hint — treat rejected patterns as one input among many, weighted moderately.
+{% endif -%}
+{% endif %}
+
 ## Your interaction history (most recent {{ history[-20:] | length }} of {{ history | length }})
 {% for h in history[-20:] -%}
 - {{ h }}
@@ -19,12 +55,42 @@
 ## Candidate items
 {% for c in candidates -%}
 [{{ loop.index }}] {{ c.description }}
+{% if peer_signals and c.item_id in peer_signals -%}
+    Peer signal: {{ peer_signals[c.item_id][1] }}
+{% endif -%}
 {% endfor %}
 
-Score every candidate in [0, 1] and produce a 3-layer rationale:
-- `personal` — does it match THIS user's taste & price band?
-- `directive` — does it serve the Expert's intent (state the trade-off if any)?
-- `trend` — is it aligned with the trend context?
+{% if peer_signals -%}
+The peer signal is ONE of several inputs. Treat a high peer ratio as a positive
+indicator but never let it override your axes-based judgement when the axes
+say otherwise.
+{% endif %}
+
+## Signal hierarchy (apply in this order of authority)
+
+1. **Personal axes + rejected patterns** — your durable preferences. Always
+   apply, since the recommendation has to fit you specifically.
+2. **Expert directive** — the MD's intent for THIS recommendation. Primary
+   external signal. Treat as instruction.
+3. **Trend context** — auxiliary editorial evidence about the season. Use
+   as a tiebreaker between candidates that score similarly on (1) and (2),
+   and as colour for the rationale. Trend NEVER overrides the directive;
+   if you are tempted to favour a candidate because of the trend even
+   though it conflicts with the directive, hold back unless ``policy_hint``
+   explicitly says otherwise.
+
+For every candidate:
+1. Compute a per-axis match in [0, 1] across the 4 axes (style/price/category/brand).
+2. Check the candidate against your REJECTED PATTERNS (if any are listed above) and apply the policy described.
+3. Produce a final `score` in [0, 1]. Weighting principle:
+   - personal axes (weighted by axis confidence) carry the most weight
+   - directive alignment is the second-largest factor
+   - trend alignment is a smaller tiebreaker / colour, NOT a primary driver
+   - rejected-pattern matches reduce the score per the active policy
+4. Write a 3-layer rationale:
+   - `personal` — MUST cite at least one specific axis by name. If a rejected pattern is relevant, mention it here.
+   - `directive` — does it serve the Expert's intent (state the trade-off if any)?
+   - `trend` — is it aligned with the trend context? It is OK to write "n/a — no relevant trend signal" when applicable.
 
 Return JSON with ALL {{ candidates | length }} candidates. Use the number (1, 2, ...) as item_id:
 {

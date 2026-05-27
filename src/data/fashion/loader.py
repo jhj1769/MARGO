@@ -304,6 +304,39 @@ def load_processed(in_dir: str | Path) -> InteractionTables:
     )
 
 
+def load_rejected(in_dir: str | Path) -> Optional[pd.DataFrame]:
+    """Load the User-Agent dual-layer 'Rejected' signal (rating 1-2).
+
+    Returns ``None`` when the file hasn't been built yet so downstream
+    consumers can degrade gracefully to positive-only behaviour. Built by
+    ``scripts/build_negative_signals.py``.
+
+    Columns: ``user_id, item_id, rating, timestamp``. Restricted to the
+    5-core entity set so every (user_id, item_id) is joinable with the
+    positive train/valid/test splits.
+    """
+    path = Path(in_dir) / "rejected.parquet"
+    if not path.exists():
+        return None
+    return pd.read_parquet(path)
+
+
+def load_reviews_text(in_dir: str | Path) -> Optional[pd.DataFrame]:
+    """Load review text + helpful_vote + verified_purchase for surviving interactions.
+
+    Built by ``scripts/build_negative_signals.py``. Used by:
+      * Item Agent autobiography — qualitative evidence per buyer cohort
+      * User Agent dual-layer reasoning — Rejected pattern explanation
+
+    Columns: ``user_id, item_id, rating, timestamp, text, helpful_vote,
+    verified_purchase``. ``rating`` covers 1-5 here (not just 1-2).
+    """
+    path = Path(in_dir) / "reviews_text.parquet"
+    if not path.exists():
+        return None
+    return pd.read_parquet(path)
+
+
 # --------------------------------------------------------------------------- #
 # Helpers used by tests / dry-runs                                             #
 # --------------------------------------------------------------------------- #
@@ -316,6 +349,32 @@ def normalise_review(row: dict) -> dict:
         "item_id": row.get("parent_asin") or row.get("asin"),
         "rating": float(row.get("rating", 0) or 0),
         "timestamp": int(row.get("timestamp", 0) or 0),
+    }
+
+
+def normalise_review_full(row: dict, *, max_text_len: int = 1000) -> dict:
+    """Extended normaliser that also carries text + helpful_vote + verified_purchase.
+
+    Used by ``scripts/build_negative_signals.py`` to extract auxiliary signals
+    that the legacy ``standard_pipeline`` discards:
+      * rating 1-3 (rejected layer for User Agent dual-layer)
+      * review text (qualitative evidence for Item Agent autobiography)
+      * helpful_vote / verified_purchase (trust signals)
+
+    Text is truncated to ``max_text_len`` to keep parquet manageable
+    (median raw text ≈ 135 chars; 1000 captures > 99% without ballooning).
+    """
+    text = row.get("text") or ""
+    if isinstance(text, str) and len(text) > max_text_len:
+        text = text[:max_text_len]
+    return {
+        "user_id": row.get("user_id"),
+        "item_id": row.get("parent_asin") or row.get("asin"),
+        "rating": float(row.get("rating", 0) or 0),
+        "timestamp": int(row.get("timestamp", 0) or 0),
+        "text": text,
+        "helpful_vote": int(row.get("helpful_vote", 0) or 0),
+        "verified_purchase": bool(row.get("verified_purchase", False)),
     }
 
 

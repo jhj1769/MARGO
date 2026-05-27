@@ -8,9 +8,32 @@ You are about to issue a directive for the current recommendation session.
 - {{ bucket }} (showing up to 40 of {{ terms | length }}): {{ terms[:40] | tojson }}
 {% endfor %}
 
+{% if past_similar_briefs -%}
+## Experiential evidence (past similar briefs and their outcomes)
+You have issued directives for similar briefs before. Use these outcomes
+to inform structure and constraint choices for the current directive:
+{% for p in past_similar_briefs -%}
+- (similarity={{ p.similarity }}) brief: "{{ p.brief_summary }}"
+  → goal: "{{ p.directive_goal }}"
+  → outcome: {{ "PASSED" if p.passed else "FAILED" }} with compliance={{ p.final_compliance_score }} after {{ p.n_refinements }} refinement(s)
+{% endfor %}
+
+When a similar brief required many refinements last time, choose constraints
+that fix the prior failure mode upfront. When a similar brief passed easily,
+mirror its structure unless the current brief explicitly diverges.
+{% endif %}
+
 Return JSON matching the MARGO Directive schema:
 {
   "goal": "...",
   "structured_constraints": { ... },
-  "natural_language": "..."
+  "natural_language": "...",
+  "policy_hint": "daily" | "trend_push" | "cohort_expansion" | null
 }
+
+The ``policy_hint`` drives the User Agent's dual-layer Rejected handling:
+- ``"daily"`` → safe daily recommendation; strict avoidance of user rejections
+- ``"trend_push"`` → exploratory new-season push; soft avoidance
+- ``"cohort_expansion"`` → cohort-driven taste expansion; light avoidance
+- ``null`` (omit) → legacy behaviour, Rejected layer not applied
+Pick the one that best matches the brief's tone. Default to ``"daily"`` if uncertain.

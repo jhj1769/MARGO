@@ -1,0 +1,41 @@
+## Multi-source trend signals (window {{ time_window }})
+
+Per-keyword aggregates from {{ sources_used | length }} sources
+({{ sources_used | join(", ") }}). Reliability priors: {{ reliability_priors }}.
+
+{% for s in signals -%}
+- **{{ s.keyword }}**: lifecycle={{ s.aggregated_lifecycle }} (consensus={{ s.consensus_score }})
+{%- if s.disagreement_flag %}
+  ⚠ Disagreement — {{ s.disagreement_nl }}
+{%- endif %}
+{%- if semantics[s.keyword] is defined and semantics[s.keyword].fashion_attributes %}
+  fashion attrs: {{ semantics[s.keyword].fashion_attributes }}
+{%- endif %}
+{%- if semantics[s.keyword] is defined and semantics[s.keyword].matched_item_ids %}
+  catalog match count: {{ semantics[s.keyword].matched_item_ids | length }}
+{%- endif %}
+
+{% endfor %}
+
+## Active directive
+{{ directive_hint }}
+
+## Output requirements
+
+Produce a TrendInterpretation that:
+- **Emphasises** high-consensus rising keywords aligned with the directive.
+  Cite the keyword by name in the summary.
+- **Hedges** disagreement-flagged keywords explicitly (e.g. "GDELT calls this
+  rising while Wikipedia disagrees — directionally promising but watch for
+  noise"). Do NOT silently pick a side.
+- **Anchors** claims to ``fashion_attributes`` (not raw keywords) when
+  available, so downstream agents see concrete catalog terms.
+
+Return JSON: {
+  "domain":            "{{ domain }}",
+  "time_window":       "{{ time_window }}",
+  "summary":           "<2-4 sentence narrative, mentioning concrete attributes>",
+  "keywords":          [...],      // the keywords you actually emphasised
+  "rising_attributes": { ... },    // {"style": [...], "category": [...], ...}
+  "raw_sources":       [...]       // pointer strings, e.g. "multisource://<snapshot_id>"
+}

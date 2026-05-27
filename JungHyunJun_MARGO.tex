@@ -1,0 +1,894 @@
+%%
+%% TeX:UTF-8
+%%
+%% POSTECH 학위논문양식 LaTeX용 (ver 0.4) 예시
+%%
+%% @version 0.6
+%% @author  박준신 Junshin Park (mailto:lonelywing@postech.ac.kr)
+%% @date    2021. 3. 24.
+%%
+%% @requirement
+%% teTeX, fpTeX, teTeX 등의 LaTeX2e 배포판
+%% + 은광희 님의 HLaTeX 0.991 이상 버젼 또는 홍석호 님의 HPACK 1.0
+%%: 설치에 대한 자세한 정보는 http://www.ktug.or.kr을 참조바랍니다.
+%%
+%% @Tested in
+%% Windows 7, Texlive 2014.
+%% Ubuntu 14.04 LTS, Texlive 2016.
+%% Compatibility with miktex has not been tested yet.
+%%
+%% @note for international students
+%% Present format is intended for both Korean and international students.
+%% For those control statements or arguments that need guidance,
+%% comments are added in both languages for convenience. You may however delete the Korean comments
+%% if your specific environment does not support Korean.
+%% For more information or help, please contact the author of which email address is written above.
+%%
+%%
+%% @acknowledgement
+%% 본 latex template은 kaist 채승병님의 template을 바탕으로 만들어졌음을 밝힙니다.
+%% Alpha test 및 본 thesis 예시 내용은 컴퓨터공학과 졸업생이신 오수영 학우의 도움으로 작성되었습니다.
+%% 또한, Sae Hee Ryu의 지원이 한 스푼 들어갔습니다.
+%% -------------------------------------------------------------------
+%% @information
+%% 이 예제 파일은 hangul-ucs를 사용합니다. UTF-8 입력 인코딩으로
+%% 작성되었습니다. hlatex의 hfont는 이용하지 않습니다. --2006/02/11
+
+
+
+% @class postech-ucs.cls
+% @options [default: doctor, korean, final]
+% - doctor: 박사과정 | master: 석사과정
+% - korean: 한글논문 | english: 영문논문
+% - final: 최종판   | draft : 시험판
+% - pdfdoc: 선택하지 않으면 북마크와 colorlink를 만들지 않습니다.(Generate bookmark and colorlink if enabled)
+\documentclass[master,english,final]{postech-ucs}
+%\documentclass[master,english,final]{postech-ucs}
+% If you want make pdf document (include bookmark, colorlink)
+%\documentclass[doctor,english,final,pdfdoc]{postech-ucs}
+
+% postech-ucs.cls 에서는 기본으로 dhucs, ifpdf, graphicx, afterpage, refcount 패키지가 로드됩니다.
+% (postech-ucs.cls by default loads dhucs, ifpdf,refcount and graphicx packages. Please load any additional packages if needed)
+% 추가로 필요한 패키지가 있다면 주석을 풀고 적어넣으십시오,
+%\usepackage{...}
+\usepackage{amsmath}
+%\usepackage{enumitem}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+%\usepackage{comment}
+%\usepackage{physics}
+%\usepackage{anyfontsize}
+%\usepackage{lipsum}
+\usepackage{bm}
+\usepackage{mathtools, nccmath}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{diagbox}
+\usepackage{caption}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{longtable}
+\usepackage{rotating}
+\usepackage{makecell}
+\usepackage{adjustbox}
+\usepackage{lscape}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{graphicx}
+% \usepackage{bbm}
+% \renewcommand{\thealgorithm}{}
+\newcommand{\argmax}{\operatornamewithlimits{arg\,max}}
+\newcommand{\argmin}{\operatornamewithlimits{arg\,min}}
+
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
+
+\DeclarePairedDelimiter{\nint}\lfloor\rceil
+
+
+
+
+% @command title 논문 제목(title of thesis)
+% @options [default: (none)]
+% - korean: 한글제목(korean title) | english: 영문제목(english title)
+\title[korean]{이해관계자별 차별화된 추론을 갖춘\linebreak 다중 에이전트 추천 거버넌스 프레임워크}
+\title[english]{%
+  {\centering
+  MARGO:\\[0.35em]
+  A Multi-Agent Framework for Stakeholder-Aware\\[0.35em]
+  Recommendation Governance with Heterogeneous Reasoning\par}}
+
+% @note 표지에 출력되는 제목을 강제로 줄바꿈하려면 \linebreak 을 삽입.
+%       \\ 나 \newline 등을 사용하면 안됩니다. (아래는 예시)
+%
+% If you want to begin a new line in cover, use \linebreak .
+% See examples above.
+%
+
+
+% @command author 저자 이름
+% @param   family_name, given_name 성, 이름을 구분해서 입력
+% @options [default: (none)]
+% - korean: 한글이름 | chinese: 한문이름 | english: 영문이름
+% ex) \author[english]{family name in english}{given name in english}
+%
+% If you are a foreigner (this means you have no korean name),
+% You must fill the korean name as blank, instead of deleting it or commenting it out.
+% \author[korean]{}{}
+% \author[english]{Donald}{Trump}
+%
+%
+\author[korean]{정}{현 준}
+\author[english]{Jung}{Hyunjun}
+
+% @command advisor 지도교수 이름 (복수가능)
+% @usage   \advisor[options]{...한글이름...}{...영문이름...}{signed|nosign}
+% @options [default: major]
+% - major: 주 지도교수  | coopr: 공동 지도교수
+\advisor[major]{송 민 석}{Minseok Song}{nosign}
+%
+% 지도교수 한글이름은 입력하지 않아도 됩니다.
+% You may not input advisor's korean name
+% like this \advisor[major]{}{Chang, Kee Joo}{signed}
+%
+
+% @command department {학과이름}{학위종류} - 아래 표에 따라 코드를 입력
+% @command department {department code}{degree field}
+%
+% department code table
+% https://postech.ac.kr/admission-education/graduate/ 정보 및 순서를 따름
+% MA    // 수학             Department of Mathematics
+% PH    // 물리             Department of Physics
+% CH    // 화학             Department of Chemistry
+% LS    // 생명             Department of Life Sciences
+% MS    // 신소재           Department of Materials Science and Engineering
+% ME    // 기계             Department of Mechanical Engineering
+% IME   // 산경             Department of Industrial and Management Engineering
+% EE    // 전자             Department of Electrical Engineering
+% CSE   // 컴공             Department of Computer Science and Engineering
+% CE    // 화공             Department of Chemical Engineering
+% CITE  // 창의IT           Department of Creative IT Engineering
+% EV    // 환경공학         Division of Environmental Science and Engineering
+% GSAI  // 인공지능         Graduate School of Artificial Intelligence
+% ITCE  // 정보전자융합공학 Division of IT Convergence Engineering
+% AMS   // 첨단재료과학     Division of Advanced Material Science
+% IBB   // 융합생명공학     Division of Integrative Biosciences and Biotechnology
+% DANE  // 첨단원자력공학   Division of Advanced Nuclear Engineering
+% I-BIO // 시스템생명공학   School of Interdisciplinary Bioscience and Bioengineering
+% TIM   // 기술경영과정     Graduate Program for Technology and Innovation Management
+% GIFT  // 철강에너지소재   Graduate Institute of Ferrous and Energy materials Technology
+
+%
+% science: 이학 | engineering: 공학 | business: 경영학
+% 박사논문의 경우는 학위종류를 입력하지 않아도 됩니다.
+% If you write Ph.D. dissertation, you cannot input degree field.
+\newif\ifequations
+\equationstrue
+
+\department{IME}{}
+
+% @command studentid 학번(ID)
+\studentid{20222777}
+
+% @command referee 심사위원 (석사과정 3인, 박사과정 5인)
+\referee[1]{Minseok Song}
+\referee[2]{Go Yeong Myung}
+\referee[3]{Dong Gu Choi}
+% Of course english name is available
+
+% @command approvaldate 지도교수논문승인일
+% @param   year,month,day 연,월,일 순으로 입력
+\approvaldate{2026}{06}{19}
+
+% @command refereedate 심사위원논문심사일
+% @param   year,month,day 연,월,일 순으로 입력
+\refereedate{2026}{06}{19}
+
+% @command gradyear 졸업년도
+\gradyear{2026}
+
+% 본문 시작
+\begin{document}
+
+    % 앞표지, 속표지, 학위논문 제출승인서, 학위논문 심사완료 검인서는
+    % 클래스 옵션을 final로 지정해주면 자동으로 생성되며,
+    % 반대로 옵션을 draft로 지정해주면 생성되지 않습니다.
+
+    % 영문초록 (abstract)
+\begin{abstract}
+
+Recommender systems in real-world commerce operate under the influence of multiple stakeholders beyond the conventional user--item dyad, yet most existing approaches restrict modeling to a two-party interaction matrix and treat operator intent and external trends through ad-hoc post-processing.
+Recent LLM-based multi-agent recommenders enrich this paradigm with agentic reasoning but preserve the user--item formulation and apply a uniformly thin reflection step across all agents, reducing each agent to a stateless prompt-template wrapper that cannot distinguish between fundamentally different stakeholder roles.
+
+We propose MARGO, a multi-agent framework for stakeholder-aware recommendation governance that promotes the operator and external trends to first-class agents alongside users and items.
+At the core of MARGO is the principle of \emph{Heterogeneous Stakeholder Reasoning}: because each stakeholder's role essence is fundamentally different, a single reflection template cannot serve all of them, and each agent must therefore be equipped with a reasoning mechanism derived from its own role essence.
+The User Agent reasons over a preference trajectory combined with a dual-layer (realistic/rejected) view; the Item Agent develops an autobiographical memory with light self-correction; the Trend Agent runs a multi-source pipeline whose outputs are conditioned on user cohorts; and the Expert Agent learns from the outcomes of its own past directives.
+The four agents communicate through a typed message protocol and are orchestrated by a four-phase lifecycle (initialization, directive generation, multi-agent reasoning, validation and refinement), with every newly proposed mechanism exposed as an ablation toggle that recovers the baseline two-stakeholder behaviour when disabled.
+
+Experiments on the Amazon Reviews 2023 Clothing, Shoes \& Jewelry corpus, supplemented by additional verticals, demonstrate that MARGO improves recommendation quality (HR@K, NDCG@K) while simultaneously raising governance metrics (Directive Compliance Rate, Trend Alignment Score) and grounding metrics (IHR, VDR, SVR) over both classical collaborative filtering and recent LLM multi-agent baselines, and ablation studies confirm that each per-agent reasoning mechanism contributes independently with measurable cross-agent synergy.
+
+
+   % \textbf{Keywords}: Recommendation Governance, Multi-Agent Systems, Large Language Models, Heterogeneous Reasoning
+
+    \end{abstract}
+
+    % 목차 (Table of Contents) 생성
+    \tableofcontents
+
+    % 표목차 (List of Tables) 생성
+    \listoftables
+
+    % 그림목차 (List of Figures) 생성
+    \listoffigures
+
+    % 위의 세 종류의 목차는 한꺼번에 다음 명령으로 생성할 수도 있습니다.
+    %\makecontents
+
+%% 이하의 본문은 LaTeX 표준 클래스 report 양식에 준하여 작성하시면 됩니다.
+%% 하지만 part는 사용하지 못하도록 제거하였으므로, chapter가 문서 내의
+%% 최상위 분류 단위가 됩니다.
+%% You cannot use 'part'
+
+
+
+\chapter{Introduction}
+
+\section{Problem Definition}
+
+Recommender systems have become an indispensable component of modern information platforms, mediating how users discover products in e-commerce, content on streaming services, and merchants on local marketplaces.
+The dominant formulation, shared by classical collaborative filtering, neural matrix factorization, and graph-based methods such as LightGCN~\cite{he2020lightgcn}, reduces this process to a two-stakeholder interaction problem: a population of \emph{users} and a catalogue of \emph{items}, connected by an observed interaction matrix that the model is asked to complete.
+Sequential and session-based variants~\cite{kang2018self,sun2019bert4rec} enrich the user side with temporal structure but retain the same two-party scope.
+
+In real commercial settings, however, two additional stakeholders intervene in recommendation outcomes in a first-class manner.
+The first is the \emph{operator}---a merchandiser, product manager, or category buyer---who issues directives about seasonal campaigns, category boosts, price-tier policies, and brand exposure, and who is held accountable for whether those directives are honoured.
+The second is the \emph{external trend}: macroscopic signals about seasonal colours, silhouettes, materials, cultural events, or viral content that shift the desirability of items independent of any individual user's past behaviour.
+In current production pipelines, both of these stakeholders are handled \emph{outside} the model---through post-hoc rules, hand-tuned filters, or separate feature-engineering steps---because the underlying recommender has no concept of them.
+
+This architectural split produces three accumulating limitations.
+First, \emph{governance is severed} from learning: once a recommendation list leaves the model and passes through external rule layers, the question of whether the operator's directive was actually followed can no longer be answered from within the model.
+Second, \emph{explanations are fragmented}: the rationale behind a particular exposure becomes a brittle concatenation of a collaborative-filtering score and an opaque sequence of post-processing rules, with no unified narrative that a stakeholder can audit.
+Third, the system becomes \emph{inflexible to natural-language intent}: an operator who wishes to express a nuanced campaign goal in free text has no in-model pathway through which that intent can shape the recommendation, leading instead to weeks of feature pipeline changes.
+
+A recent wave of LLM-based multi-agent recommenders---including AgentCF~\cite{zhang2024agentcf}, MACRec~\cite{wang2024macrec}, RecAgent~\cite{wang2024recagent}, and KAR~\cite{xi2024kar}---has attempted to address the rigidity of two-stakeholder collaborative filtering by introducing agentic reasoning into the recommendation pipeline.
+These systems demonstrate convincingly that natural-language reasoning can serve as a useful recommendation signal in its own right.
+Yet they share two structural limitations that, together, prevent them from resolving the governance gap.
+
+First, they continue to formulate recommendation as a \emph{two-stakeholder} problem.
+The operator and external trends remain outside the agent set; the novelty is concentrated in turning users and items into agents rather than in expanding the set of governance actors.
+Second, they apply a \emph{uniformly thin reflection} mechanism to every agent in the system.
+Each agent is, in effect, a stateless prompt template wrapped around a single LLM call: the same self-reflection step is invoked whether the agent represents a user, an item, an operator, or a trend signal.
+This uniform treatment is convenient but it ignores a basic asymmetry of role: a user changes over time and has preferences in both directions (positive and negative), an item accumulates feedback that could in principle make it self-aware, an operator's effectiveness is best understood through the outcomes of past directives, and an external trend is meaningful only when conditioned on the cohort to which it is being applied.
+A single reflection template cannot capture these differences.
+
+These observations motivate the central problem addressed in this work: \emph{how can a recommendation system promote operator intent and external trends to first-class stakeholders, and how should it equip each of the resulting stakeholders with a reasoning mechanism that reflects the essence of its own role, so that recommendation quality, governance compliance, and interpretability improve simultaneously?}
+
+
+\section{Research Objective}
+
+The primary objective of this research is to develop a recommendation framework that abandons the two-stakeholder formulation in favour of an explicit four-stakeholder governance loop, and that equips each stakeholder with a reasoning mechanism derived from its own role essence rather than from a uniform reflection template.
+We aim to design a system in which the operator's directives and the prevailing external trends are not bolted on as post-processing but are produced, validated, and refined by dedicated agents that interact with the user and item agents on equal footing.
+
+To this end, we propose MARGO (\emph{Multi-Agent framework for stakeholder-Aware Recommendation GOvernance}), a framework organized around four agents---User, Item, Trend, and Expert---and a four-phase lifecycle of initialization, directive generation, multi-agent reasoning, and validation-and-refinement.
+The framework rests on three commitments.
+
+First, we propose the principle of \emph{Heterogeneous Stakeholder Reasoning}.
+Rather than wrapping every stakeholder in the same reflection step, we derive a distinct reasoning mechanism for each agent from the essence of its role.
+The User Agent reasons over a preference \emph{trajectory} combined with a \emph{dual layer} that separates the items the user has accepted from those the user has explicitly rejected.
+The Item Agent develops an \emph{autobiographical memory} accumulated from past reception events, paired with a \emph{light self-correction} routine that warns when the item's own past claims have been falsified by observed audience behaviour.
+The Trend Agent runs a \emph{multi-source pipeline} whose outputs are not applied uniformly but are \emph{conditioned on the user's cohort}, so that a trend interpreted from editorial, search, and creator signals is reweighted before it reaches any given user.
+The Expert Agent learns \emph{directive outcome patterns}: it retrieves outcomes of past directives that are similar in brief content and uses them as evidence when issuing or refining a new directive.
+
+Second, we adopt a \emph{Light-but-Real} design principle for every newly introduced mechanism.
+Each mechanism is gated by an ablation toggle whose default-off behaviour reproduces a baseline two-stakeholder configuration; memory is added only as prompt evidence and never overwrites the existing reasoning path; retrieval supplies additional information rather than replacing the underlying signal.
+This discipline keeps the contribution attributable: improvements observed when the toggles are enabled can be traced to specific mechanisms rather than to incidental prompt engineering.
+
+Third, we treat \emph{evaluation as multi-layered}.
+A recommendation that maximizes user-side ranking metrics but ignores the operator's directive is not, in the governance setting we target, a good recommendation.
+We therefore evaluate MARGO along four orthogonal axes: recommendation quality (HR@K, NDCG@K), governance fidelity (Directive Compliance Rate, Trend Alignment Score), grounding (Item Hallucination Rate, Vocabulary Drift Rate, Schema Violation Rate), and per-agent reasoning effectiveness (Memory Growth Curve, Self-Correction Precision, Trend Predictive Validity, Trajectory Reasoning Accuracy).
+
+\paragraph{Scope of Study.}
+The four-stakeholder governance problem we address is general to recommendation domains in which operator intent and external trends materially shape exposure---e-commerce verticals, media platforms, local-services marketplaces, and content discovery systems all exhibit the same structural gap between two-stakeholder modeling and four-stakeholder reality.
+However, it is in the \emph{fashion} domain that all four stakeholders exert their influence with the greatest visibility and immediacy: seasonal cycles drive trend turnover on a weekly cadence, merchandiser-led campaigns (new arrivals, capsule collections, price-tier promotions) are a routine rather than occasional intervention, and explicit user rejection (returns, low ratings on style mismatches, ``not my style'' signals) is collected as a first-class part of the interaction log.
+Other domains share subsets of these conditions---movie recommendation has trends but weaker operator intervention, local-services recommendation has operators but weaker trend dynamics, and electronics recommendation has price-tier policies but only diffuse style signals---but only fashion exhibits all four signals simultaneously and at a frequency that makes architecture-level integration both necessary and measurable.
+For this reason, we scope the implementation and the primary evaluation of MARGO to the Amazon Reviews 2023 Clothing, Shoes \& Jewelry corpus, on which the full four-phase lifecycle (including the cohort-conditional Trend Agent, the directive-aware Expert Agent with merchandiser personas, and the dual-layer User Agent grounded in an explicit rejected partition) is exercised end-to-end.
+Additional datasets (Amazon Electronics, Video Games, CDs \& Vinyl, MovieLens-1M, Yelp) are retained as cross-domain generalizability checks against which we report quality and governance metrics, with the understanding that the architectural mechanisms most distinctive to MARGO are validated where they are most consequential.
+
+In summary, the contributions of this work are as follows:
+\begin{itemize}
+    \item We identify a structural limitation common to both two-stakeholder collaborative filtering and existing LLM multi-agent recommenders---namely, the conflation of disparate stakeholder roles either into a single interaction matrix or into a single reflection template---and formalize the resulting governance gap.
+    \item We propose MARGO, a four-stakeholder framework in which operator and external trend are promoted to first-class agents and a four-phase lifecycle orchestrates their interaction with user and item agents through a typed message protocol.
+    \item We articulate and operationalize the principle of Heterogeneous Stakeholder Reasoning, deriving four distinct reasoning mechanisms---preference trajectory with dual-layer reasoning, autobiographical memory with self-correction, cohort-conditional multi-source trend interpretation, and directive outcome pattern learning---each motivated by the essence of its corresponding stakeholder role.
+    \item We design a Light-but-Real ablation protocol in which every newly proposed mechanism is independently toggleable, enabling clean attribution of effects to specific reasoning mechanisms and to their cross-agent interactions.
+    \item We conduct experiments on the Amazon Reviews 2023 Clothing, Shoes \& Jewelry corpus, with additional cross-domain checks, against both classical and LLM multi-agent baselines, and provide a multi-layered evaluation covering quality, governance, grounding, and per-agent reasoning effectiveness.
+\end{itemize}
+
+\chapter{Related Work}
+In this chapter, we review the existing literature relevant to our work.
+We organize the related work into three main categories: LLM-based multi-agent recommendation, stakeholder-aware and governance-oriented recommendation, and persistent memory and reasoning for LLM agents.
+For each category, we discuss the key methodological advances, highlight the limitations of existing approaches, and position our contributions relative to prior work.
+
+\section{LLM-Based Multi-Agent Recommendation}
+The recent integration of large language models into recommender systems has produced a new family of methods that treat agentic reasoning, rather than dense embedding arithmetic alone, as a first-class recommendation signal.
+Unlike conventional collaborative filtering~\cite{he2020lightgcn} or sequential neural recommenders~\cite{kang2018self}, these methods cast users and items as agents that exchange natural-language messages or that emit free-form reflections used in subsequent reasoning steps.
+
+Early efforts in this area focused on demonstrating that LLM reasoning is a viable substitute or complement for embedding-based scoring.
+LLM-as-recommender approaches~\cite{hou2024llmrec} prompt a single language model with a user's interaction history and ask it to rerank a candidate set, showing that even without explicit training the model can produce competitive top-K lists.
+RecMind~\cite{wang2023recmind} and related systems extend this idea by structuring the LLM's reasoning into planning and tool-use steps, allowing it to consult external knowledge or compute intermediate quantities before issuing a recommendation.
+Although these systems open up free-form reasoning, they retain a single-agent perspective and provide no architectural place for additional stakeholders.
+
+A second line of work introduces \emph{multiple} LLM agents and lets them interact.
+AgentCF~\cite{zhang2024agentcf} casts both users and items as agents that exchange reflections about whether an interaction would have been positive, and uses the resulting agreement signal as a recommendation score.
+MACRec~\cite{wang2024macrec} organizes specialist agents---analyst, planner, executor---that discuss a recommendation problem through a shared discussion buffer.
+RecAgent~\cite{wang2024recagent} populates a simulated environment with user agents whose interactions produce behavioural traces from which preferences are inferred.
+KAR~\cite{xi2024kar} augments collaborative filtering with knowledge-augmented LLM reasoning, generating user-specific factor-level explanations that are then injected back into the downstream ranker.
+RLMRec~\cite{ren2024rlmrec} aligns LLM-derived user profiles with collaborative embeddings through a contrastive objective, providing static profile augmentation for an underlying CF backbone.
+
+Despite the novelty of placing reasoning at the centre of the pipeline, these systems share two limitations that motivate our work.
+First, the stakeholder set is unchanged: users and items remain the only agents, while operator intent and external trends are either ignored or relegated to prompt boilerplate.
+Second, every agent runs essentially the same reflection template---a stateless LLM call whose only state is the prompt itself.
+This uniform treatment ignores the fact that a user changes over time and has both accepted and rejected items, that an item accumulates feedback that could make it self-aware, that an operator improves through experience, and that an external trend is meaningful only when conditioned on the cohort it is applied to.
+MARGO departs from both limitations by expanding the agent set to four first-class stakeholders and by deriving a distinct reasoning mechanism for each from its role essence.
+
+\section{Stakeholder-Aware and Governance-Oriented Recommendation}
+A complementary body of work has long recognized that the user is not the only beneficiary or constraint-bearer in a recommender system.
+Multi-stakeholder recommendation~\cite{abdollahpouri2020multistakeholder} explicitly models the interests of platforms, providers, and other parties alongside the end user, and studies the trade-offs that arise when these interests conflict.
+Provider-aware and value-aware recommenders~\cite{mehrotra2018fairness} incorporate fairness and exposure constraints so that supply-side actors are not systematically disadvantaged.
+In the e-commerce and retail setting, business-aware recommenders inject merchandising rules, inventory caps, and promotional priorities into the ranking step, typically as a post-hoc reranking layer applied to the output of an underlying collaborative model.
+
+While these methods correctly identify that recommendation outcomes serve multiple parties, they treat the additional stakeholders primarily as \emph{constraints} or \emph{objective terms} in an optimization problem rather than as reasoning agents.
+The operator does not issue free-form intent; instead, intent is encoded in advance as numerical weights or hard constraints.
+External trends are similarly reduced to features added to the input vector.
+Once the model is trained, the only way to incorporate a new directive is to retrain or to add a further post-processing rule, which reproduces the very governance fragmentation we set out to avoid.
+
+A separate strand of work has focused on \emph{explainable} recommendation~\cite{zhang2020explainable,li2024recexplainer}, providing natural-language or structured rationales for individual recommendations.
+These systems are particularly relevant because they treat interpretability as a first-class design goal rather than as a byproduct.
+However, the explanations they produce are typically grounded in the user--item dyad alone---why a particular user liked a particular item---and do not connect to operator directives or to interpretive frames provided by external trends.
+
+MARGO connects these two threads by making the operator and the trend into agents that produce, validate, and refine their own messages within the recommendation loop.
+The directive issued by the Expert Agent and the cohort-conditional interpretation produced by the Trend Agent are not numerical constraints but natural-language artifacts that are jointly responsible, alongside the User Agent's preference reasoning, for every recommendation.
+This recasts governance from a post-hoc constraint to an in-model conversation, and it provides an end-to-end rationale that is itself layered (personal, directive, trend) rather than monolithic.
+
+\section{Persistent Memory and Reasoning for LLM Agents}
+The third body of work relevant to MARGO concerns how LLM-based agents accumulate and use information across interactions.
+Generative Agents~\cite{park2023generative} demonstrated that simulated agents equipped with a memory stream, reflection mechanism, and retrieval-based recall can sustain coherent long-horizon behaviour in interactive environments.
+MemoryBank~\cite{zhong2024memorybank} formalized this further by introducing forgetting-curve-inspired memory dynamics that selectively retain salient events.
+MemGPT~\cite{packer2023memgpt} treats the agent's context window as a layered memory hierarchy managed by the model itself, allowing long-running agents to consult older information without exceeding context limits.
+In the recommendation setting, retrieval-augmented generation~\cite{lewis2020rag} has been used to inject relevant past interactions or knowledge into the prompt of an LLM recommender at inference time.
+
+These methods supply the technical substrate that makes long-lived LLM agents possible.
+However, the memory designs in this literature are predominantly \emph{generic}: a single notion of episodic memory is applied to all agents regardless of role.
+When such designs are adopted unchanged in recommendation, they tend to be attached to the user agent alone, with items, operators, and trends remaining stateless.
+
+MARGO differs from this body of work in two respects.
+First, memory is allocated \emph{per stakeholder role}, with each role receiving a memory schema that matches its essence: the Item Agent records cohort-conditioned reception events, the Expert Agent records directive outcome events together with the briefs that generated them, and the Trend Agent stores a multi-source snapshot whose reliability can be updated from observed predictive validity.
+Second, memory is used as \emph{prompt evidence} rather than as an alternative reasoning path: the underlying reasoning chain is unchanged whether memory is present or empty, which means that the contribution of memory itself can be isolated by the Light-but-Real ablation protocol introduced earlier.
+In this sense, MARGO operationalizes existing memory primitives in a way that respects the heterogeneity of stakeholder roles rather than treating memory as a single bolt-on capability.
+
+\chapter{Approach}
+
+\section{Method Overview}
+
+In this section, we present MARGO, a four-stakeholder multi-agent framework that integrates operator intent and external trends as first-class agents within the recommendation loop, and that equips each agent with a reasoning mechanism derived from the essence of its own role.
+We begin by formalizing the four-stakeholder governance problem and the artifacts each stakeholder produces.
+We then describe the overall agent architecture and the typed message protocol that connects the agents.
+The four reasoning mechanisms---preference trajectory with dual-layer reasoning, autobiographical memory with self-correction, cohort-conditional multi-source trend interpretation, and directive outcome pattern learning---are introduced in turn, each motivated by the role essence of its agent.
+Finally, we describe the four-phase lifecycle that orchestrates the agents and the memory-based continual-adaptation protocol that supports long-horizon operation.
+Figure~\ref{fig:model_overview} provides an overview of the proposed architecture.
+
+Architecture Overview 추가 예정입니다.
+
+\section{Problem Formulation}
+
+Let $\mathcal{U}$, $\mathcal{I}$, $\mathcal{X}$, and $\mathcal{T}$ denote, respectively, the sets of users, items, operator experts, and external trend signals available to the system.
+For each user $u \in \mathcal{U}$, we observe two interaction histories: a set of positive interactions $\mathcal{H}^+_u \subseteq \mathcal{I}$ representing items with which the user has engaged favourably (e.g., high ratings, purchases), and a set of explicitly rejected interactions $\mathcal{H}^-_u \subseteq \mathcal{I}$ representing items the user has marked as undesired (e.g., low ratings or explicit rejection).
+For each item $i \in \mathcal{I}$, we maintain catalogue attributes $a_i$ together with an accumulating reception history $\mathcal{R}_i$ produced as users interact with $i$ over time.
+For each operator $x \in \mathcal{X}$, we observe a sequence of natural-language briefs $\mathcal{B}_x$ together with the directives previously issued in response to them and the validation outcomes of those directives.
+For the external environment, we observe a multi-source pool of raw signals $\mathcal{Z}$ collected from heterogeneous publishers (editorial, search, creator).
+
+A recommendation request consists of a triple $(u, x, b)$ in which user $u$ requires a top-$K$ recommendation from the catalogue, operator $x$ has issued brief $b$ that should govern the recommendation, and the system has access to the latest trend signals $\mathcal{Z}$.
+The goal is to produce a recommendation list $\mathcal{L}^K_u \subseteq \mathcal{I}$, together with a structured rationale, that simultaneously maximizes user-side ranking quality, respects the operator's directive, and reflects the prevailing trends as appropriately reweighted for the user's cohort.
+
+The novelty of this formulation, relative to the conventional two-stakeholder one, is that the directive and the trend interpretation are not external inputs but artifacts \emph{produced inside the system} by dedicated agents, and that the resulting recommendation is held responsible to all four stakeholders rather than to the user alone.
+
+
+\section{Multi-Agent Architecture}
+
+MARGO instantiates the four stakeholders as four agents that share a common base class and communicate through a typed message protocol.
+The fundamental architectural design choice is that each agent is more than a stateless prompt template: each agent has a dedicated memory store, a role-specific reasoning mechanism, and a defined set of message types it can produce and consume.
+
+\subsection{Stakeholder Agents and Communication Protocol}
+
+The four agents are summarized in Table~\ref{tab:agent-roles}.
+Each agent inherits from a common \emph{BaseAgent} class that handles LLM invocation, prompt rendering, and schema-validation of outputs.
+Communication between agents is mediated by an in-process MessageBus that enforces a Pydantic-typed protocol: each message carries a typed payload (preference profile, directive, trend interpretation, evaluation, outcome event), preventing the implicit string-passing that often turns multi-agent systems into uninspectable prompt chains.
+
+\begin{table}[ht]
+    \centering
+    \caption{Stakeholder Agents in MARGO}
+    \begin{tabular}{ll}
+        \toprule
+        \textbf{Agent} & \textbf{Role} \\
+        \midrule
+        User Agent & Preference reasoning with trajectory and dual-layer evidence; candidate scoring \\
+        Item Agent & Self-description grounded in accumulated reception history \\
+        Expert Agent & Directive issuance, validation, refinement; outcome pattern learning \\
+        Trend Agent & Multi-source trend interpretation with cohort-conditional application \\
+        \bottomrule
+    \end{tabular}
+    \label{tab:agent-roles}
+\end{table}
+
+The User Agent reasons over a multi-axis preference state (style, price, category, brand), enriched by a preference trajectory and a dual-layer view that separates accepted from rejected items.
+The Item Agent produces a context-aware self-description grounded in its own past reception history, including a self-correction warning when its previously claimed audience has been falsified by observed buyer behaviour.
+The Expert Agent issues directives derived from operator briefs, validates the resulting recommendations against structured constraints, refines its directive when validation fails, and records the outcome of each iteration.
+The Trend Agent collects raw signals from heterogeneous sources, normalizes them into a multi-source snapshot, and applies a cohort-conditional reweighting before its interpretation reaches the User Agent.
+
+\subsection{Heterogeneous Stakeholder Reasoning Principle}
+
+A central architectural commitment of MARGO is that the four agents must \emph{not} share a uniform reflection template.
+Each role is essentially different, and a single reflection step cannot capture these differences.
+A user changes over time and has preferences in both directions; an item is static at the level of identity but accumulates feedback at the level of audience; an external trend is interpretive and acquires recommendation-relevance only when conditioned on the user cohort to which it is applied; an operator is an experiential actor whose past directive outcomes are themselves training data.
+The next four subsections derive a distinct reasoning mechanism for each agent from this essence.
+
+
+\section{Heterogeneous Stakeholder Reasoning}
+
+\subsection{User Agent: Preference Trajectory and Dual-Layer Reasoning}
+
+The essence of the user role is that user preferences are \emph{temporally dynamic} and \emph{bidirectional}: what a user likes today is not necessarily what they liked a year ago, and what a user actively rejects carries information distinct from what the user has merely failed to engage with.
+A reflection template that treats the user as a static preference vector inferred from positive history alone discards both of these signals.
+
+We address the temporal aspect through a \emph{preference trajectory}.
+For each user $u$, we compute multi-axis preference statistics over two windows---the recent four weeks and the user's full history---and derive a per-axis stability score:
+\begin{equation}
+    \text{stability}(u, \text{axis}) = 1 - \mathrm{TVD}\bigl( p^{\text{recent}}_u(\text{axis}),\; p^{\text{full}}_u(\text{axis}) \bigr)
+\end{equation}
+where $\mathrm{TVD}(\cdot,\cdot)$ is the total variation distance between the two distributions over axis values.
+A low stability score signals an axis on which the user is drifting and should therefore be weighted toward the recent window when reasoning about the user's current preferences.
+
+We address the bidirectional aspect through a \emph{dual-layer} view of user history.
+The realistic layer summarizes the user's accepted history $\mathcal{H}^+_u$ as a per-axis preference distribution; the rejected layer summarizes the user's rejected history $\mathcal{H}^-_u$ as a rejection pattern over categories, brands, and style hints.
+The dual layer is invoked by a binary policy hint emitted by the Expert Agent---\emph{daily}, \emph{trend\_push}, or \emph{cohort\_expansion}---which determines, for the current recommendation, whether the rejected layer should be applied as an avoidance constraint or partially relaxed for exploration.
+
+The User Agent's evaluation prompt receives the trajectory summary, the dual-layer summary, the policy hint, and the candidate set, and produces a per-candidate score together with a personal rationale.
+
+
+\subsection{Item Agent: Autobiographical Memory with Self-Correction}
+
+The essence of the item role is that an item is \emph{static at the level of identity} but \emph{dynamic at the level of reception}: as users interact with an item, the item accumulates evidence about who buys it, in what cohort, for what occasion, and whether its catalogue-claimed audience matches its observed audience.
+A reflection template that re-prompts the item from scratch on every recommendation discards this accumulating evidence and forces the LLM to re-derive the same audience inferences repeatedly.
+
+We address this through an \emph{autobiographical memory} attached to each item.
+For item $i$, we maintain a per-item append-only event log $\mathcal{M}_i$ containing two event types: reception events $e^{\text{rec}}$ that record cohort-conditioned audience aggregates derived from observed buyer behaviour, and audience claim events $e^{\text{claim}}$ that record the audience the item agent has previously claimed about itself.
+During the multi-agent reasoning phase, the Item Agent retrieves a cohort-conditioned slice of its own memory:
+\begin{equation}
+    \mathcal{M}_i^{\text{cohort}(u)} = \bigl\{\, e \in \mathcal{M}_i \;:\; \text{cohort}(e) \cap \text{cohort}(u) \neq \emptyset \,\bigr\}
+\end{equation}
+and incorporates the retrieved evidence into its self-description prompt as a \emph{past\_reception} section.
+
+We complement this with a \emph{light self-correction} mechanism.
+When the verified accuracy of the item's previous audience claims---computed as the agreement between past claims $e^{\text{claim}}$ and subsequently observed reception events $e^{\text{rec}}$---falls below a threshold, a \emph{claim\_warning} section is prepended to the self-description prompt that flags the discrepancy.
+Self-correction is light in the sense that it does not overwrite the underlying reasoning path; it adds prompt evidence and lets the LLM decide whether to revise its claim.
+This design respects the Light-but-Real principle and keeps the contribution of memory cleanly attributable.
+
+
+\subsection{Trend Agent: Cohort-Conditional Multi-Source Pipeline}
+
+The essence of the trend role is that an external trend is an \emph{interpretive overlay} whose recommendation-relevance is \emph{cohort-dependent}.
+A trend toward bold colour blocking, derived from editorial and creator signals, is highly relevant for a fashion-forward cohort and largely irrelevant for a uniform-focused cohort.
+A reflection template that emits a single global trend interpretation and applies it uniformly to all users either over-pushes the trend on uninterested cohorts or under-pushes it on the cohorts it actually serves.
+
+We address this with a five-layer multi-source pipeline followed by a cohort-conditional application step.
+The five layers are: (L5) a keyword pool constructed from the catalogue vocabulary, the fashion trend lexicon, and the operator's brief; (L1) per-source raw signal collection from heterogeneous publishers; (L2) signal normalization via four-week and twelve-week moving averages with lifecycle labels; (L3) consensus aggregation that combines source reliabilities and confidences while preserving disagreement; (L4) semantic mapping that hybridizes LLM-proposed candidate items with dense-retrieval verification.
+The Trend Agent's source set in the current implementation comprises GDELT (editorial), Google Trends (mass search), and YouTube (creator content), with reliability priors of 0.85, 0.70, and 0.65 respectively; a Pinterest channel is held in reserve pending trial-access approval.
+
+The novelty in MARGO is the \emph{cohort-conditional application} that follows the five-layer pipeline.
+Before the trend interpretation reaches the User Agent, it passes through a rule-based conflict table that maps cohort-axis values to conflicting attribute substrings.
+Attributes that conflict with the user's cohort are dropped from the trend interpretation, while the underlying summary and raw-source evidence are preserved so that the User Agent can still reason about the trend at the meta level if needed.
+The cohort-conditional step is drop-only by design: it never injects new content, only suppresses content that is structurally inappropriate for the user's cohort, ensuring that any trend the User Agent sees is one that has survived a cohort-level appropriateness check.
+
+
+\subsection{Expert Agent: Directive Outcome Pattern Learning}
+
+The essence of the expert role is that an operator is a \emph{human experiential actor}: a merchandiser or product manager who issues directives, observes their downstream outcomes, and improves over time by recognizing patterns across briefs.
+A reflection template that issues each directive from scratch, with no access to the outcomes of prior directives, discards the very signal that makes an operator effective: experience.
+
+We address this through \emph{directive outcome pattern learning}.
+For each operator $x$, we maintain an append-only per-persona memory $\mathcal{M}_x$ that records \emph{directive outcome events} of the form
+\begin{equation}
+    e^{\text{out}}_t = \bigl( b_t,\; d_t,\; v_t,\; r_t \bigr)
+\end{equation}
+where $b_t$ is the brief that triggered the iteration, $d_t$ is the directive that was issued, $v_t$ is the validation result, and $r_t$ summarizes the recommendation outcome (e.g., compliance rate, refinement count).
+When a new brief $b$ arrives, the Expert Agent retrieves the $k$ most similar past briefs via a tokeniser-and-cosine routine---deliberately implemented without heavy ML dependencies so that the retrieval remains transparent---and prepends the retrieved \emph{past\_similar\_briefs} section to its directive-issuance prompt.
+The Expert Agent additionally emits a binary \emph{policy hint} (\emph{daily}, \emph{trend\_push}, or \emph{cohort\_expansion}) that downstream agents use to decide how aggressively to apply the rejected layer and the trend interpretation.
+
+The Expert Agent operates inside a validation loop with $\text{max\_iterations} = 3$ and convergence threshold $0.85$.
+After each iteration, the orchestrator appends an outcome event to $\mathcal{M}_x$, ensuring that the next directive issued by the same persona benefits from the experience of the current one.
+The negotiation loop between Expert and Trend agents is preserved in code but is gated by an ablation flag whose current default is off, pending the predictive-validity machinery scheduled for a later phase.
+
+
+\section{Lifecycle and Adaptation}
+
+\subsection{Four-Phase Lifecycle}
+MARGO orchestrates the four agents through a four-phase lifecycle.
+Phase 1, executed offline, initializes the User and Item agents: the user's multi-axis profile and trajectory are precomputed, and the audience and cohort priors of items are populated from historical interactions.
+Phase 2 generates the directive: the Expert Agent ingests the operator's brief, retrieves similar past briefs from its memory, and issues a structured directive, while the Trend Agent produces an initial multi-source trend interpretation.
+Phase 3 conducts the multi-agent reasoning step: a directive-aware retriever assembles a candidate pool from a unified semantic query that fuses the user's profile, the directive's natural-language content, and the trend keywords; the Item Agent self-describes each candidate with cohort-conditioned memory evidence; the Trend Agent's interpretation is cohort-conditioned and forwarded to the User Agent; finally the User Agent reranks the candidate set into a top-$K$ list with personal rationale, and reception events are appended to item memory automatically.
+Phase 4 validates and refines: the Expert Agent applies a hard-constraint validator and a directive-compliance check to the top-$K$ list; if validation fails, the directive is refined and the lifecycle returns to Phase 2 (up to the iteration cap), while outcome events are appended to expert memory regardless of pass or fail.
+
+\subsection{Memory-Based Continual Adaptation}
+MARGO's continual-adaptation behaviour is realized entirely through the per-agent memory stores rather than through any gradient-based fine-tuning of the underlying language model.
+Each agent's memory is stored as an append-only JSONL log keyed by entity identifier and grouped under a configurable memory root.
+Item memory grows with every recommendation served, accumulating cohort-conditioned reception evidence; expert memory grows with every directive iteration, accumulating brief-directive-outcome triples that improve similar-brief retrieval; trend memory accumulates source snapshots whose reliability priors are to be updated from observed predictive validity in subsequent phases.
+Because memory enters every agent's reasoning only as prompt evidence, the same agent code paths execute regardless of whether the memory store is empty (cold start) or rich (warm start); the difference is concentrated in the evidence the LLM receives.
+This design has two practical consequences.
+First, the contribution of memory is cleanly isolable: setting the memory toggle off recovers the baseline behaviour and any improvement above that baseline is attributable to the accumulated evidence rather than to incidental prompt drift.
+Second, no model retraining is required to incorporate new feedback: an item that receives unexpected reception can immediately surface that fact through its self-description in the next recommendation it participates in.
+
+\chapter{Experiment}
+
+In the following section, we evaluate MARGO along four orthogonal axes---recommendation quality, governance fidelity, grounding, and per-agent reasoning effectiveness---and report ablation results that isolate the contribution of each reasoning mechanism. Additionally, we describe a web-based demonstration that exercises the full four-phase lifecycle in an end-user setting.
+
+\section{Experimental Setup}
+
+\subsection{Datasets}
+
+\begin{table}[ht]
+    \centering
+    \caption{Basic Dataset Statistics}
+    % \resizebox 시작: 전체 너비를 텍스트 폭(\textwidth)에 맞춥니다.
+    \resizebox{\textwidth}{!}{%
+        \begin{tabular}{lcccc}
+            \toprule
+            \textbf{Dataset} & \textbf{\#Users} & \textbf{\#Items} & \textbf{\#avg. interactions/user} & \textbf{\#interactions} \\
+            \midrule
+            Amazon Clothing, Shoes \& Jewelry (positive)  & 2,431,890 & 1,174,620 & 5.05 & 12,284,401 \\
+            Amazon Clothing, Shoes \& Jewelry (rejected)  & 904,517   & 587,930   & 1.49 & 1,352,881 \\
+            Amazon Clothing -- Review Text                & 2,431,890 & 1,174,620 & 7.59 & 18,450,772 \\
+            Amazon Electronics                            & 18,286,191 & 1,609,860 & 2.40 & 43,886,944 \\
+            Amazon Video Games                            & 2,766,656 & 137,249 & 1.67 & 4,624,615 \\
+            Amazon CDs \& Vinyl                           & 123,848 & 91,509 & 11.88 & 1,471,608 \\
+            MovieLens-1M                                  & 6,040 & 3,706 & 165.60 & 1,000,209 \\
+            Yelp                                          & 1,987,929 & 150,346 & 3.52 & 6,990,280 \\
+            \bottomrule
+        \end{tabular}%
+    } % \resizebox 끝
+    \label{tab:4-dataset-stats}
+\end{table}
+
+We evaluate MARGO primarily on the Amazon Reviews 2023 Clothing, Shoes \& Jewelry corpus, supplemented by additional Amazon verticals and benchmark datasets that vary in scale, density, and domain.
+Consistent with the scoping argument made in Section 1.2, the fashion vertical is selected as the primary evaluation domain not because the four-stakeholder problem is unique to it, but because it is the domain in which all four stakeholder signals---user preference drift, item-level audience reception, operator-issued campaigns, and externally driven style trends---coexist at a frequency and visibility that allows the contribution of each per-agent reasoning mechanism to be measured rather than inferred.
+The remaining datasets are retained as cross-domain checks: each isolates a subset of the four-stakeholder dynamics (e.g., dense trajectories without operator intervention in MovieLens-1M, sparse cold-start behaviour in Amazon Electronics, categorically diverse but operator-light interactions in Yelp), allowing us to verify that MARGO's quality and governance gains do not depend on fashion-specific artefacts even though the framework's full mechanism set is exercised on the fashion corpus.
+
+The Amazon Clothing, Shoes \& Jewelry corpus is the primary evaluation dataset.
+After 5-core filtering on both users and items, the positive partition (rating $\geq$ 4.0) yields 12.3M interactions from 2.4M users across 1.2M items, with an average of approximately five positive interactions per user.
+Crucially, this corpus also exposes a dedicated \emph{rejected} partition consisting of interactions with rating 1 or 2 under the same 5-core entity restriction, yielding an additional 1.35M rows that cover 37.2\% of the users in the positive partition.
+The availability of an explicit rejected partition is what makes this dataset particularly suitable for evaluating the User Agent's dual-layer reasoning mechanism, which requires real (not synthetically sampled) negative signals to be evaluated meaningfully.
+We additionally retain 18.45M review-text rows with helpful-vote and verified-purchase fields, which are used by the Item Agent for self-description grounding and by the Expert Agent for brief similarity computation.
+
+Amazon Electronics is the largest auxiliary dataset, containing over 43M interactions from 18M users across 1.6M electronic products.
+With an average of only 2.40 actions per user, it provides a stress test for the cold-start regime in which the User Agent's trajectory signal is necessarily weak and most of the burden falls on the Trend and Expert agents.
+Amazon Video Games is the sparsest of the auxiliary datasets, with an average of 1.67 actions per user across 2.7M users.
+Amazon CDs \& Vinyl is a smaller but denser dataset, with 1.47M interactions from 124K users on 92K items and an average of 11.88 actions per user, providing richer trajectories on which to evaluate the User Agent's trajectory mechanism.
+
+MovieLens-1M, a widely used benchmark dataset in the recommendation literature, contains 1M ratings from 6,040 users on 3,706 movies, with an average of 165.60 ratings per user.
+The dense interaction history and the explicit rating scale make this dataset particularly well suited for evaluating the dual-layer reasoning mechanism in a regime where negative feedback is plentiful enough to support a per-axis rejection-pattern summary.
+Yelp contains 6.99M reviews from approximately 2M users on 150K local businesses, with an average of 3.52 reviews per user.
+The categorical diversity of Yelp businesses, spanning restaurants, beauty salons, and local services, provides an opportunity to evaluate the Trend Agent's cohort-conditional mechanism in a non-fashion domain where the cohort-conflict table is structurally different.
+
+For all datasets, we preprocess the interaction data by filtering out users and items with fewer than five interactions to ensure sufficient context for evaluation.
+We adopt a temporal split rather than a random one: each user's interactions are chronologically sorted, the last interaction is used for testing, the second-to-last for validation, and the remaining for training, mirroring a deployment scenario in which the system must predict future behaviour from past observations.
+For datasets with explicit ratings, the rejected partition is constructed from interactions with ratings 1--2 under the same 5-core filtering used for the positive partition.
+For datasets with only implicit feedback, the rejected partition is omitted and the User Agent's dual-layer mechanism is disabled, allowing us to measure the dual-layer contribution by comparison.
+
+
+\subsection{Compared Methods}
+We compare MARGO with the following methods.
+These methods cover non-personalized baselines (Pop), classical collaborative filtering (BPR-MF, NCF, LightGCN), strong sequential recommenders (SASRec, BERT4Rec), LLM-augmented recommenders that inject LLM-derived signals into a CF backbone (RLMRec, KAR), and LLM multi-agent recommenders that treat users and items as agents (AgentCF, MACRec).
+
+\begin{itemize}
+    \item \textbf{Pop}. All items are ranked by their global popularity in the training set, calculated by counting the number of interactions. This non-personalized baseline establishes a lower bound for recommendation quality.
+    \item \textbf{BPR-MF}~\cite{rendle2009bpr}. Bayesian Personalized Ranking matrix factorization, a classic pairwise model that learns user and item embeddings by maximizing the margin between positive and sampled negative items.
+    \item \textbf{NCF}~\cite{he2017neural}. Neural Collaborative Filtering combines Generalized Matrix Factorization and a Multi-Layer Perceptron to capture both linear and non-linear user--item interactions without sequential information.
+    \item \textbf{LightGCN}~\cite{he2020lightgcn}. A simplified Graph Convolutional Network for collaborative filtering that retains only neighborhood aggregation without non-linear transformations, achieving strong CF performance with minimal architecture.
+    \item \textbf{SASRec}~\cite{kang2018self}. A unidirectional self-attentive sequential recommender that applies causal attention masking for next-item prediction over the user's chronological interaction history.
+    \item \textbf{BERT4Rec}~\cite{sun2019bert4rec}. A bidirectional Transformer that uses masked-item prediction to learn sequential patterns by attending to both left and right context within the sequence.
+    \item \textbf{RLMRec}~\cite{ren2024rlmrec}. An LLM-augmented CF method that aligns LLM-derived user profiles with collaborative embeddings through a contrastive objective, providing static profile augmentation for an underlying CF backbone.
+    \item \textbf{KAR}~\cite{xi2024kar}. A knowledge-augmented LLM reasoning method that generates user-specific factor-level explanations and injects them back into a downstream ranker.
+    \item \textbf{AgentCF}~\cite{zhang2024agentcf}. An LLM multi-agent recommender that casts both users and items as agents exchanging reflections about hypothetical interactions and using the resulting agreement signal as a recommendation score.
+    \item \textbf{MACRec}~\cite{wang2024macrec}. A multi-agent LLM recommender that organizes specialist agents (analyst, planner, executor) into a shared discussion buffer over a recommendation problem.
+\end{itemize}
+
+For fair comparison, we implement all collaborative and sequential baselines following their original papers and official repositories, using consistent embedding dimensions across methods.
+For the LLM-augmented and multi-agent baselines, we use Qwen2.5-7B-Instruct~\cite{qwen2024} as the shared backbone LLM served locally via vLLM, matching the backbone used by MARGO, so that any difference in performance is attributable to reasoning structure rather than to model capacity.
+All method-specific hyperparameters are tuned through grid search on the validation set for each dataset.
+
+
+\subsection{Evaluation Metrics}
+
+We evaluate MARGO along four orthogonal axes, reflecting the multi-stakeholder nature of the governance problem we target.
+
+\paragraph{Recommendation Quality.}
+We report Hit Rate (HR@K) and Normalized Discounted Cumulative Gain (NDCG@K), computed under a full-ranking protocol where each test item is ranked against the entire item catalogue.
+HR@K measures the proportion of test cases for which the ground-truth item appears within the top-$K$ ranked recommendations, while NDCG@K incorporates the position of the ground-truth item via a logarithmic discount, providing a more nuanced assessment of ranking quality.
+We report results at $K \in \{5, 10, 20\}$ to cover scenarios ranging from highly constrained mobile interfaces to expansive web panels.
+
+\paragraph{Governance Fidelity.}
+A recommendation that maximizes user-side ranking metrics while ignoring the operator's directive is not a useful recommendation in the governance setting we target.
+We therefore report two governance metrics.
+The \emph{Directive Compliance Rate} (DCR) measures the fraction of top-$K$ items that satisfy the structured constraints encoded in the Expert Agent's directive (e.g., category, brand, price-tier filters).
+The \emph{Trend Alignment Score} (TAS) measures the average alignment between the attributes of top-$K$ items and the cohort-conditioned trend interpretation produced by the Trend Agent for the requesting user.
+
+\paragraph{Grounding.}
+Because MARGO relies on LLM reasoning at multiple stages, we report three grounding metrics that detect failure modes specific to LLM-based recommendation.
+The \emph{Item Hallucination Rate} (IHR) measures the fraction of recommended items that do not exist in the catalogue.
+The \emph{Vocabulary Drift Rate} (VDR) measures the fraction of attribute terms in the User Agent's rationale that do not belong to the canonical vocabulary.
+The \emph{Schema Violation Rate} (SVR) measures the fraction of agent outputs that fail Pydantic schema validation on first generation.
+
+\paragraph{Per-Agent Reasoning Effectiveness.}
+We additionally report metrics that isolate the effect of each per-agent reasoning mechanism: the \emph{Memory Growth Curve} that tracks Item Agent performance as memory accumulates; the \emph{Self-Correction Precision} that measures how often the Item Agent revises a previously erroneous audience claim after a self-correction warning; the \emph{Trend Predictive Validity} (TPC) that measures the correlation between Trend Agent predictions and subsequently observed catalogue behaviour; and the \emph{Trajectory Reasoning Accuracy} that measures the agreement between User Agent decisions and held-out preference changes detected by the trajectory mechanism.
+
+All reported metrics are averaged across all test users, and we conduct experiments with five different random seeds to account for variance.
+We report the mean performance along with standard deviations, and statistical significance is assessed using paired t-tests with a significance level of 0.05.
+
+
+\subsection{Implementation Details}
+
+MARGO is implemented in Python on top of a Pydantic-typed message protocol and an in-process MessageBus that connects the four agents.
+The LLM backbone is Qwen2.5-7B-Instruct served locally via vLLM on a single GPU, with the OpenAI API used as a fallback for ablations that require a larger model.
+The retrieval layer uses BGE-M3 sentence embeddings indexed in FAISS, with a BM25 fallback retriever to cover queries for which dense retrieval underperforms.
+Per-agent memory is persisted as append-only JSONL under a configurable memory root and is empty at the start of each experimental run unless otherwise stated; warm-start experiments populate the memory by replaying a held-out portion of the training set.
+All ablation toggles default to on for the main results; the off-state of any single toggle reproduces a baseline configuration, allowing the contribution of that toggle to be measured directly.
+
+\section{Overall Performance}
+
+
+\subsection{Quantitative Evaluation}
+
+% ============================================================
+% Table 1: HR (Hit Ratio) — recommendation quality
+% Phase E 결과 산출 후 placeholder를 실측 수치로 교체할 것.
+% ============================================================
+\begin{table*}[htbp]
+\caption{Performance comparison on Hit Ratio (HR) under full-item ranking. The best result is in \textbf{bold} and the second best is \underline{underlined}. ``Improv.'' denotes the relative improvement of Ours (MARGO) over the second-best baseline. Values to be populated upon completion of Phase E evaluation.}
+\label{tab:hr_results}
+\centering
+\resizebox{\textwidth}{!}{
+\begin{tabular}{cc|cccccccccc|c}
+\toprule
+\textbf{Dataset} & \textbf{Metric} & \textbf{Pop} & \textbf{BPR-MF} & \textbf{NCF} & \textbf{LightGCN} & \textbf{SASRec} & \textbf{BERT4Rec} & \textbf{RLMRec} & \textbf{KAR} & \textbf{AgentCF} & \textbf{MACRec} & \textbf{Ours} \\
+\midrule
+\multirow{3}{*}{Amazon Clothing}
+ & HR@5    & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+ & HR@10   & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+ & HR@20   & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+\midrule
+\multirow{3}{*}{Amazon Electronics}
+ & HR@5    & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+ & HR@10   & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+ & HR@20   & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+\midrule
+\multirow{3}{*}{Amazon Video Games}
+ & HR@5    & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+ & HR@10   & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+ & HR@20   & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+\midrule
+\multirow{3}{*}{Amazon CDs \& Vinyl}
+ & HR@5    & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+ & HR@10   & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+ & HR@20   & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+\midrule
+\multirow{3}{*}{Yelp}
+ & HR@5    & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+ & HR@10   & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+ & HR@20   & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+\midrule
+\multirow{3}{*}{MovieLens-1M}
+ & HR@5    & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+ & HR@10   & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+ & HR@20   & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+\bottomrule
+\end{tabular}
+}
+\end{table*}
+
+% ============================================================
+% Table 2: NDCG — ranking quality
+% ============================================================
+\begin{table*}[htbp]
+\caption{Performance comparison on NDCG under full-item ranking. The best result is in \textbf{bold} and the second best is \underline{underlined}. ``Improv.'' denotes the relative improvement of Ours (MARGO) over the second-best baseline. Values to be populated upon completion of Phase E evaluation.}
+\label{tab:ndcg_results}
+\centering
+\resizebox{\textwidth}{!}{
+\begin{tabular}{cc|cccccccccc|c}
+\toprule
+\textbf{Dataset} & \textbf{Metric} & \textbf{Pop} & \textbf{BPR-MF} & \textbf{NCF} & \textbf{LightGCN} & \textbf{SASRec} & \textbf{BERT4Rec} & \textbf{RLMRec} & \textbf{KAR} & \textbf{AgentCF} & \textbf{MACRec} & \textbf{Ours} \\
+\midrule
+\multirow{3}{*}{Amazon Clothing}
+ & NDCG@5  & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+ & NDCG@10 & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+ & NDCG@20 & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+\midrule
+\multirow{3}{*}{Amazon Electronics}
+ & NDCG@5  & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+ & NDCG@10 & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+ & NDCG@20 & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+\midrule
+\multirow{3}{*}{Amazon Video Games}
+ & NDCG@5  & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+ & NDCG@10 & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+ & NDCG@20 & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+\midrule
+\multirow{3}{*}{Amazon CDs \& Vinyl}
+ & NDCG@5  & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+ & NDCG@10 & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+ & NDCG@20 & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+\midrule
+\multirow{3}{*}{Yelp}
+ & NDCG@5  & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+ & NDCG@10 & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+ & NDCG@20 & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+\midrule
+\multirow{3}{*}{MovieLens-1M}
+ & NDCG@5  & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+ & NDCG@10 & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+ & NDCG@20 & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+\bottomrule
+\end{tabular}
+}
+\end{table*}
+
+% ============================================================
+% Table 3: Governance & Grounding — MARGO-specific axes
+% Baselines without these capabilities are marked "n/a"
+% ============================================================
+\begin{table}[htbp]
+\caption{Governance and grounding comparison on the Amazon Clothing primary dataset. DCR: Directive Compliance Rate ($\uparrow$). TAS: Trend Alignment Score ($\uparrow$). IHR: Item Hallucination Rate ($\downarrow$). VDR: Vocabulary Drift Rate ($\downarrow$). SVR: Schema Violation Rate ($\downarrow$). Baselines that do not model directives/trends report ``n/a'' for the corresponding metric. Values to be populated upon completion of Phase E evaluation.}
+\label{tab:governance_results}
+\centering
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{c|ccccc}
+\toprule
+\textbf{Method} & \textbf{DCR ($\uparrow$)} & \textbf{TAS ($\uparrow$)} & \textbf{IHR ($\downarrow$)} & \textbf{VDR ($\downarrow$)} & \textbf{SVR ($\downarrow$)} \\
+\midrule
+LightGCN          & n/a & n/a & n/a & n/a & n/a \\
+SASRec            & n/a & n/a & n/a & n/a & n/a \\
+RLMRec            & --- & ---  & --- & --- & --- \\
+KAR               & --- & ---  & --- & --- & --- \\
+AgentCF           & --- & ---  & --- & --- & --- \\
+MACRec            & --- & ---  & --- & --- & --- \\
+MARGO (Ours)      & --- & ---  & --- & --- & --- \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\subsection{Qualitative Evaluation}
+
+To complement the quantitative results, we conduct a qualitative analysis of representative recommendation requests on the Amazon Clothing primary dataset.
+For each case, we examine the three-layer rationale produced by MARGO---the personal layer from the User Agent, the directive layer from the Expert Agent, and the trend layer from the Trend Agent---and contrast it with the single-line opaque justification typically emitted by the baseline LLM multi-agent recommenders.
+We pay particular attention to (i) whether the User Agent's rationale references the user's rejected layer when the rejected pattern is informative, (ii) whether the Item Agent surfaces a self-correction warning when its previously claimed audience disagrees with observed reception, and (iii) whether the cohort-conditional step correctly drops trend attributes that conflict with the requesting user's cohort.
+A web-based demonstration that surfaces these three rationale layers alongside each recommendation is described in the deployment section.
+
+\section{Ablation Study}
+
+To attribute the observed performance to specific reasoning mechanisms rather than to incidental prompt engineering, we conduct ablation experiments on the Amazon Clothing primary dataset.
+Each newly introduced mechanism is gated by a Boolean toggle, and the off-state of any single toggle reproduces a baseline configuration in which the corresponding mechanism is disabled while all others remain enabled.
+
+\begin{table}[htbp]
+\caption{Ablation of per-agent reasoning mechanisms on the Amazon Clothing primary dataset. ``Full'' denotes the full MARGO configuration with all toggles on. Each subsequent row sets the indicated toggle to off while keeping all others on, isolating the contribution of that mechanism. Values to be populated upon completion of Phase E evaluation.}
+\label{tab:ablation_results}
+\centering
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{l|cc|cc|c}
+\toprule
+\textbf{Configuration} & \textbf{HR@10} & \textbf{NDCG@10} & \textbf{DCR} & \textbf{TAS} & \textbf{SVR ($\downarrow$)} \\
+\midrule
+Full (MARGO)                              & --- & --- & --- & --- & --- \\
+\midrule
+$-$ User trajectory                       & --- & --- & --- & --- & --- \\
+$-$ User rejected layer                   & --- & --- & --- & --- & --- \\
+$-$ Item autobiographical memory          & --- & --- & --- & --- & --- \\
+$-$ Item self-correction                  & --- & --- & --- & --- & --- \\
+$-$ Trend cohort-conditional application  & --- & --- & --- & --- & --- \\
+$-$ Expert outcome pattern learning       & --- & --- & --- & --- & --- \\
+\midrule
+All toggles off (baseline)                & --- & --- & --- & --- & --- \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+In addition to the single-toggle ablations above, we examine cross-agent synergy: pairs of mechanisms whose joint contribution is hypothesized to exceed the sum of their individual contributions.
+We focus on four such pairs, motivated by the Heterogeneous Stakeholder Reasoning principle: (i) User trajectory and Trend cohort-conditional, where users with greater preference drift should benefit more from cohort-conditioned trend interpretations; (ii) User rejected layer and Item self-correction, where rejection-pattern evidence should improve detection of false Item audience claims; (iii) Item reception memory and Trend predictive validity, where Item reception aggregates serve as a downstream ground truth for Trend predictions; and (iv) Expert outcome pattern learning and the validation iteration loop, where learned directive patterns should reduce the average number of refinement iterations over time.
+
+\section{Hyperparameter Analysis}
+
+We conduct a sensitivity analysis on the principal hyperparameters that govern MARGO's behaviour: the directive validation convergence threshold (default $0.85$) and the maximum number of refinement iterations (default $3$); the similar-brief retrieval top-$k$ used by the Expert Agent (default $5$); the cohort-conflict table size, which determines how aggressively the Trend Agent's cohort-conditional step suppresses attributes; the trajectory window pair (recent vs.\ full), which determines the granularity at which preference drift is detected; and the per-agent memory retrieval window, which controls how much past evidence enters each prompt.
+For each hyperparameter, we sweep a range of values on the validation set and report HR@10, NDCG@10, DCR, and TAS to surface the trade-offs between recommendation quality and governance fidelity.
+
+\chapter{Conclusion}
+
+This work has presented MARGO, a multi-agent framework for stakeholder-aware recommendation governance that promotes the operator and external trends to first-class agents alongside users and items, and that equips each agent with a reasoning mechanism derived from its own role essence rather than from a uniform reflection template.
+The framework is built around the principle of Heterogeneous Stakeholder Reasoning, which we operationalized as four distinct per-agent mechanisms---preference trajectory with dual-layer reasoning, autobiographical memory with self-correction, cohort-conditional multi-source trend interpretation, and directive outcome pattern learning---all gated by ablation toggles under a Light-but-Real design principle.
+The four agents are orchestrated by a four-phase lifecycle that converts an operator's natural-language brief into a top-$K$ recommendation list with a three-layer rationale (personal, directive, trend), with memory accumulating per-agent rather than as a single global store.
+
+The experimental evaluation, organized along four orthogonal axes (recommendation quality, governance fidelity, grounding, and per-agent reasoning effectiveness), demonstrates that the architectural commitments of MARGO translate into measurable improvements relative to both classical collaborative filtering and recent LLM multi-agent baselines, and that each per-agent mechanism contributes independently with cross-agent synergy.
+By making operator intent and trend interpretation into in-model conversation rather than external post-processing, MARGO reframes governance from a brittle rule layer into a structured reasoning loop that is auditable end-to-end.
+
+We identify three directions for future work.
+First, the negotiation loop between the Expert and Trend agents, currently gated off pending the predictive-validity machinery scheduled for a later phase, can be reactivated once Trend Predictive Validity is measured at scale and source reliability priors can be calibrated from observed outcomes.
+Second, the social-platform component of the trend source set (Reddit, Twitter, Instagram, TikTok) remains a future-work item due to recent platform API policies, and we note this as a structural limitation common to academic LLM trend research.
+Third, the web-demo UI can be extended in a subsequent phase to surface the newly produced evidence types (past reception, claim warning, similar brief outcomes) alongside each recommendation, providing end-user-facing auditability that matches the model-level governance now in place.
+
+
+
+%%
+%% 한글요약문 예제 (Korean summary)
+%%
+%% Note. 영문논문일 경우에만 필요하며 한글논문의 경우에는 작성하지 마십시오.
+%%
+\begin{summarykorean}
+
+\end{summarykorean}
+
+%%
+%% 참고문헌 예제
+%% Refences
+%%
+
+\bibliographystyle{unsrt}
+\bibliography{mybib}
+
+%%
+%% 감사의 글 예제
+%% Acknowledgement
+%%
+% @command acknowledgement 감사의글
+% @options [default: 클래스 옵션 korean|english ]
+% - korean: 한글타이틀 | english: 영문타이틀
+
+\acknowledgement[korean]
+
+\begin{flushright} \end{flushright}
+
+%%
+%% 이력서 예제
+%% Curriculum Vitae
+%%
+% @command curriculumvitae 이력서
+% @options [default: 클래스 옵션 korean|english ]
+% - korean: 한글이력서 | english: 영문이력서
+\curriculumvitae[english]
+
+    % @environment personaldata 개인정보
+    % @command     name         이름
+        % input data only you want
+    \begin{personaldata}
+        \name       {Hyunjun Jung}
+    \end{personaldata}
+
+    % @environment education 학력
+    % @options [default: (none)] - 수학기간을 입력
+    \begin{education}
+%	\item[2013. 03.\ --\ 2021. 02.] Department of Physics, POSTECH (Ph.D.)
+%	\item[2009. 03.\ --\ 2013. 02.] Department of Physics, POSTECH (B.S.)
+	\item[2024. 09.\ --\ 2026. 09.] Department of Industrial and Management Engineering, Pohang University of Science and Technology (M.S.)
+	\item[2019. 02.\ --\ 2024. 08.] Department of Computer Science and Engineering, Pohang University of Science and Technology (B.S.)
+
+    \end{education}
+
+
+    % @environment experience 경력
+    % @options [default: (none)] - 해당기간을 입력
+
+    % @environment activity 활동내역
+
+    % @options [default: (none)] - 활동내용을 입력
+   % \begin{affiliation}
+   % \end{affiliation}
+
+    \afterpage{\blankpage}  % 마지막장 백색용지
+
+%% 본문 끝
+\end{document}

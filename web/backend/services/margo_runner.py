@@ -89,12 +89,20 @@ class MargoRunner:
             processed = os.getenv("MARGO_PROCESSED_DIR")
             if not processed:
                 raise RuntimeError("MARGO_PROCESSED_DIR not set — defaulting to mock mode")
+            # Phase B/D — agentic memory root. When set, Item & Expert agents
+            # persist their typed events under <memory_root>/{item,expert}/.
+            # Unset ⇒ NullMemory (legacy v3 behaviour, deployment back-compat).
+            memory_root_env = os.getenv("MARGO_MEMORY_ROOT")
+            memory_root = Path(memory_root_env) if memory_root_env else None
             cfg = MargoEngineConfig(
                 processed_dir=Path(processed),
                 snapshot_dir=Path(os.getenv("MARGO_SNAPSHOT_DIR", processed)) / "trend_cache",
                 bm25_only=os.getenv("MARGO_BM25_ONLY", "0") == "1",
                 time_window=os.getenv("MARGO_TREND_WINDOW", "2023-Q2"),
+                memory_root=memory_root,
             )
+            if memory_root:
+                log.info("agentic memory enabled — root=%s", memory_root)
             engine = MargoEngine(cfg)
             return cls(mode="engine", engine=engine)
         except Exception as e:
